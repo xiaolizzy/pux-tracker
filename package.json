@@ -1,0 +1,11 @@
+{
+  "name": "pux-tracker",
+  "version": "1.0.0",
+  "description": "PUX 进化观测站 - 产品设计师转型进度看板",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}

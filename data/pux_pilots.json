@@ -1,0 +1,17 @@
+{
+  "pilots": [
+    {
+      "id": "pux_001",
+      "name": "试点成员A",
+      "current_step": 1,
+      "status": "in_progress",
+      "last_update": "2026-04-13",
+      "history": []
+    }
+  ],
+  "steps_definition": {
+    "1": "直接和研发对齐任务",
+    "2": "自己产生想法并推进",
+    "3": "从想法到Demo甚至推广运营"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/pux", "dest": "/public/pux-checkin.html" },
+    { "src": "/pux-admin", "dest": "/public/pux-admin.html" },
+    { "src": "/api/(.*)", "dest": "/api/$1.js" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
+  "crons": [
+    {
+      "path": "/api/pux-friday-reminder",
+      "schedule": "0 16 * * 5"
+    },
+    {
+      "path": "/api/pux-monday-digest",
+      "schedule": "30 9 * * 1"
+    }
+  ]
+}

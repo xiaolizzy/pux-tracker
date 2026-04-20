@@ -1,0 +1,212 @@
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;PUX 进化观测站 - 管理员后台&lt;/title&gt;
+    &lt;style&gt;
+        body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f9; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .card h2 { margin-top: 0; color: #555; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
+        .form-group { flex: 1; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { padding: 12px 24px; background-color: #07c160; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #06ae56; }
+        button.danger { background-color: #ff4d4f; }
+        button.danger:hover { background-color: #cf1322; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #fafafa; font-weight: bold; }
+        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 14px; }
+        .status-in_progress { background: #fff7e6; color: #fa8c16; }
+        .status-completed { background: #f6ffed; color: #52c41a; }
+        .actions { display: flex; gap: 8px; }
+        .edit-btn { background: #1890ff; }
+        .edit-btn:hover { background: #096dd9; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-secondary { background: #d9d9d9; color: #333; }
+        .btn-secondary:hover { background: #bfbfbf; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="container"&gt;
+        &lt;h1&gt;🎯 PUX 进化观测站 - 管理员后台&lt;/h1&gt;
+
+        &lt;div class="card"&gt;
+            &lt;h2&gt;➕ 添加新试点成员&lt;/h2&gt;
+            &lt;div class="form-row"&gt;
+                &lt;div class="form-group"&gt;
+                    &lt;label&gt;姓名&lt;/label&gt;
+                    &lt;input type="text" id="new-name" placeholder="输入姓名"&gt;
+                &lt;/div&gt;
+                &lt;button onclick="addPilot()"&gt;添加&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class="card"&gt;
+            &lt;h2&gt;📊 试点成员列表&lt;/h2&gt;
+            &lt;table&gt;
+                &lt;thead&gt;
+                    &lt;tr&gt;
+                        &lt;th&gt;姓名&lt;/th&gt;
+                        &lt;th&gt;当前阶段&lt;/th&gt;
+                        &lt;th&gt;状态&lt;/th&gt;
+                        &lt;th&gt;最后更新&lt;/th&gt;
+                        &lt;th&gt;操作&lt;/th&gt;
+                    &lt;/tr&gt;
+                &lt;/thead&gt;
+                &lt;tbody id="pilots-table"&gt;
+                &lt;/tbody&gt;
+            &lt;/table&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class="modal" id="edit-modal"&gt;
+        &lt;div class="modal-content"&gt;
+            &lt;h2&gt;编辑成员信息&lt;/h2&gt;
+            &lt;div class="form-group" style="margin-bottom: 15px;"&gt;
+                &lt;label&gt;姓名&lt;/label&gt;
+                &lt;input type="text" id="edit-name"&gt;
+            &lt;/div&gt;
+            &lt;div class="form-group" style="margin-bottom: 15px;"&gt;
+                &lt;label&gt;当前阶段&lt;/label&gt;
+                &lt;select id="edit-step"&gt;
+                    &lt;option value="1"&gt;Step 1&lt;/option&gt;
+                    &lt;option value="2"&gt;Step 2&lt;/option&gt;
+                    &lt;option value="3"&gt;Step 3&lt;/option&gt;
+                &lt;/select&gt;
+            &lt;/div&gt;
+            &lt;div class="form-group" style="margin-bottom: 15px;"&gt;
+                &lt;label&gt;状态&lt;/label&gt;
+                &lt;select id="edit-status"&gt;
+                    &lt;option value="in_progress"&gt;进行中&lt;/option&gt;
+                    &lt;option value="completed"&gt;已达成&lt;/option&gt;
+                &lt;/select&gt;
+            &lt;/div&gt;
+            &lt;div class="modal-actions"&gt;
+                &lt;button class="btn-secondary" onclick="closeEditModal()"&gt;取消&lt;/button&gt;
+                &lt;button onclick="saveEdit()"&gt;保存&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        let pilotsData = [];
+        let editingPilot = null;
+        let stepsDefinition = {};
+
+        function loadData() {
+            fetch('/api/pux-admin')
+                .then(res =&gt; res.json())
+                .then(data =&gt; {
+                    pilotsData = data.pilots;
+                    stepsDefinition = data.steps_definition;
+                    renderTable();
+                });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('pilots-table');
+            tbody.innerHTML = '';
+            pilotsData.forEach(pilot =&gt; {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    &lt;td&gt;${pilot.name}&lt;/td&gt;
+                    &lt;td&gt;Step ${pilot.current_step} - ${stepsDefinition[pilot.current_step]}&lt;/td&gt;
+                    &lt;td&gt;&lt;span class="status-badge status-${pilot.status}"&gt;${pilot.status === 'completed' ? '已达成' : '进行中'}&lt;/span&gt;&lt;/td&gt;
+                    &lt;td&gt;${pilot.last_update}&lt;/td&gt;
+                    &lt;td&gt;
+                        &lt;div class="actions"&gt;
+                            &lt;button class="edit-btn" onclick="openEditModal('${pilot.id}')"&gt;编辑&lt;/button&gt;
+                            &lt;button class="danger" onclick="deletePilot('${pilot.id}')"&gt;删除&lt;/button&gt;
+                        &lt;/div&gt;
+                    &lt;/td&gt;
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addPilot() {
+            const name = document.getElementById('new-name').value;
+            if (!name) {
+                alert('请输入姓名');
+                return;
+            }
+            fetch('/api/pux-admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'add', pilot: { name } })
+            })
+            .then(res =&gt; res.json())
+            .then(res =&gt; {
+                if (res.success) {
+                    document.getElementById('new-name').value = '';
+                    loadData();
+                }
+            });
+        }
+
+        function openEditModal(id) {
+            editingPilot = pilotsData.find(p =&gt; p.id === id);
+            if (editingPilot) {
+                document.getElementById('edit-name').value = editingPilot.name;
+                document.getElementById('edit-step').value = editingPilot.current_step;
+                document.getElementById('edit-status').value = editingPilot.status;
+                document.getElementById('edit-modal').style.display = 'flex';
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            editingPilot = null;
+        }
+
+        function saveEdit() {
+            if (!editingPilot) return;
+            const updated = {
+                id: editingPilot.id,
+                name: document.getElementById('edit-name').value,
+                current_step: parseInt(document.getElementById('edit-step').value),
+                status: document.getElementById('edit-status').value
+            };
+            fetch('/api/pux-admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'update', pilot: updated })
+            })
+            .then(res =&gt; res.json())
+            .then(res =&gt; {
+                if (res.success) {
+                    closeEditModal();
+                    loadData();
+                }
+            });
+        }
+
+        function deletePilot(id) {
+            if (!confirm('确定要删除这个成员吗？')) return;
+            fetch('/api/pux-admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete', pilot: { id } })
+            })
+            .then(res =&gt; res.json())
+            .then(res =&gt; {
+                if (res.success) {
+                    loadData();
+                }
+            });
+        }
+
+        loadData();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
