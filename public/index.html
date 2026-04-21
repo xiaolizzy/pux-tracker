@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUX 转型看板</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .nav button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .nav button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .nav button.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    .pux-card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .pux-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .pux-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .product-info {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .po-info {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .step {
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid;
+      background: #f9f9f9;
+      transition: all 0.3s;
+    }
+
+    .step.pending {
+      border-left-color: #ddd;
+      opacity: 0.6;
+    }
+
+    .step.in_progress {
+      border-left-color: #ffa500;
+      background: #fff8e6;
+    }
+
+    .step.completed {
+      border-left-color: #00c853;
+      background: #e8f5e9;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .step-status {
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-weight: 500;
+    }
+
+    .step-status.pending {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .step-status.in_progress {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .step-status.completed {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .step-description {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .step-project {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #667eea;
+      font-weight: 500;
+    }
+
+    .step-date {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .last-update {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .feedback-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #f0f0f0;
+    }
+
+    .feedback-title {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .feedback-item {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+
+    .feedback-metrics {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 8px;
+    }
+
+    .metric {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .metric-label {
+      font-weight: 500;
+      color: #666;
+    }
+
+    .metric-value {
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .loading {
+      text-align: center;
+      color: white;
+      font-size: 1.2rem;
+      padding: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎯 PUX 转型看板</h1>
+      <p>跟踪从 UED 到 PUX 的三步转型进度</p>
+    </header>
+
+    <div class="nav">
+      <button class="active" onclick="showSection('board')">看板展示</button>
+      <button onclick="showSection('pux-form')">PUX 进度收集</button>
+      <button onclick="showSection('po-form')">PO 协作反馈</button>
+      <button onclick="showSection('admin')">管理后台</button>
+    </div>
+
+    <div id="board" class="section">
+      <div id="board-container" class="board"></div>
+    </div>
+
+    <div id="pux-form" class="section" style="display: none;">
+      <div class="container" style="max-width: 600px; margin: 0 auto;">
+        <div class="pux-card" style="max-width: 100%;">
+          <h2 style="text-align: center; margin-bottom: 20px; color: #333;">📝 PUX 进度收集</h2>
+          <form id="puxForm" onsubmit="savePuxProgress(event)">
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">选择 PUX</label>
+              <select id="puxSelect" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                <option value="">请选择...</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">当前步骤</label>
+              <select id="stepSelect" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                <option value="1">第一步：直接和研发对齐任务</option>
+                <option value="2">第二步：自己产生想法并推进</option>
+                <option value="3">第三步：从想法到 demo 甚至到推广运营</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">状态</label>
+              <select id="statusSelect" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                <option value="in_progress">进行中</option>
+                <option value="completed">已完成</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">关联项目</label>
+              <input type="text" id="projectInput" placeholder="请输入关联项目名称" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">详细说明（可选）</label>
+              <textarea id="descriptionInput" rows="4" placeholder="请输入详细说明" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+            </div>
+            <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.3s;">提交进度</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="po-form" class="section" style="display: none;">
+      <div class="container" style="max-width: 700px; margin: 0 auto;">
+        <div class="pux-card" style="max-width: 100%;">
+          <h2 style="text-align: center; margin-bottom: 20px; color: #333;">💬 PO 协作反馈</h2>
+          <form id="poForm" onsubmit="savePoFeedback(event)">
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">PO 姓名</label>
+              <input type="text" id="poNameInput" placeholder="请输入您的姓名" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">选择 PUX</label>
+              <select id="puxSelectPo" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
+                <option value="">请选择...</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">1. 业务指标评价</label>
+              <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">负责模块的核心 KPI 是否有正向变化？</p>
+              <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                <label style="display: flex; align-items: center; gap: 5px;">
+                  <input type="radio" name="businessMetric" value="positive"> 正向变化
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                  <input type="radio" name="businessMetric" value="neutral"> 无变化
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                  <input type="radio" name="businessMetric" value="negative"> 负向变化
+                </label>
+              </div>
+              <textarea id="businessMetricComment" rows="2" placeholder="请输入详细说明（可选）" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">2. 协作效率评价</label>
+              <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">方案产出效率是否显著高于老模式？</p>
+              <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                <label style="display: flex; align-items: center; gap: 5px;">
+                  <input type="radio" name="collaboration" value="high"> 显著提高
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                  <input type="radio" name="collaboration" value="medium"> 差不多
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                  <input type="radio" name="collaboration" value="low"> 反而降低
+                </label>
+              </div>
+              <textarea id="collaborationComment" rows="2" placeholder="请输入详细说明（可选）" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">3. 项目进展</label>
+              <textarea id="projectProgress" rows="3" placeholder="请描述当前项目的进展情况和遇到的问题" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">4. 下一步计划</label>
+              <textarea id="nextPlan" rows="3" placeholder="请描述对 PUX 下一步工作的建议" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">5. 总体评价</label>
+              <textarea id="overallComment" rows="3" placeholder="请输入对 PUX 的总体评价" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
+            </div>
+            <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.3s;">提交反馈</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin" class="section" style="display: none;">
+      <div class="container" style="max-width: 1200px; margin: 0 auto;">
+        <div class="pux-card" style="max-width: 100%;">
+          <h2 style="text-align: center; margin-bottom: 20px; color: #333;">⚙️ 管理后台</h2>
+          
+          <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+            <h3 style="margin-bottom: 15px; color: #333;">PUX 成员管理</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+              <input type="text" id="adminPuxName" placeholder="姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+              <input type="text" id="adminPuxProduct" placeholder="产品/业务" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+              <input type="text" id="adminPuxPo" placeholder="PO 姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+              <button onclick="addPux()" style="padding: 10px 20px; background: #00c853; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">添加</button>
+            </div>
+            <div id="puxAdminList"></div>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom: 15px; color: #333;">备选 PUX 管理</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+              <input type="text" id="adminBackupName" placeholder="姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+              <input type="text" id="adminBackupProduct" placeholder="产品/业务" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+              <input type="text" id="adminBackupPo" placeholder="PO 姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
+              <button onclick="addBackup()" style="padding: 10px 20px; background: #00c853; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">添加</button>
+            </div>
+            <div id="backupAdminList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentData = null;
+
+    async function loadData() {
+      try {
+        const response = await fetch('/api/get_data');
+        currentData = await response.json();
+        renderBoard();
+        renderPuxSelects();
+        renderAdminLists();
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+      document.getElementById(sectionId).style.display = 'block';
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function renderBoard() {
+      const container = document.getElementById('board-container');
+      if (!currentData) {
+        container.innerHTML = '<div class="loading">加载中...</div>';
+        return;
+      }
+
+      container.innerHTML = currentData.pux_members.map(pux => {
+        const feedbacks = currentData.po_feedback.filter(f => f.pux_id === pux.id);
+        
+        return `
+          <div class="pux-card">
+            <div class="card-header">
+              <div>
+                <div class="pux-name">${pux.name}</div>
+                <div class="po-info">PO: ${pux.po_name}</div>
+              </div>
+              <div class="product-info">${pux.product_business}</div>
+            </div>
+            <div class="steps-container">
+              ${renderStep(pux, 1)}
+              ${renderStep(pux, 2)}
+              ${renderStep(pux, 3)}
+            </div>
+            ${feedbacks.length > 0 ? `
+              <div class="feedback-section">
+                <div class="feedback-title">📝 PO 反馈</div>
+                ${feedbacks.slice(-2).map(f => `
+                  <div class="feedback-item">
+                    <div style="font-weight: 600; margin-bottom: 8px; color: #667eea;">${f.po_name} · ${f.date}</div>
+                    <div class="feedback-metrics">
+                      <div class="metric">
+                        <span class="metric-label">业务指标:</span>
+                        <span class="metric-value">${f.business_metric || '-'}</span>
+                      </div>
+                      <div class="metric">
+                        <span class="metric-label">协作效率:</span>
+                        <span class="metric-value">${f.collaboration_efficiency || '-'}</span>
+                      </div>
+                    </div>
+                    ${f.project_progress ? `<div style="margin-top: 8px; color: #666;">${f.project_progress}</div>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+            <div class="last-update">最后更新: ${pux.last_update}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderStep(pux, step) {
+      const stepData = pux.steps[`step${step}`];
+      const statusText = {
+        pending: '待开始',
+        in_progress: '进行中',
+        completed: '已完成'
+      };
+
+      return `
+        <div class="step ${stepData.status}">
+          <div class="step-header">
+            <div class="step-title">${currentData.steps_definition[`step${step}`].name}</div>
+            <div class="step-status ${stepData.status}">${statusText[stepData.status]}</div>
+          </div>
+          <div class="step-description">${currentData.steps_definition[`step${step}`].description}</div>
+          ${stepData.project ? `<div class="step-project">📦 ${stepData.project}</div>` : ''}
+          ${stepData.completed_date ? `<div class="step-date">✅ 完成于 ${stepData.completed_date}</div>` : ''}
+        </div>
+      `;
+    }
+
+    function renderPuxSelects() {
+      if (!currentData) return;
+
+      const selects = ['puxSelect', 'puxSelectPo'];
+      selects.forEach(id => {
+        const select = document.getElementById(id);
+        select.innerHTML = '<option value="">请选择...</option>' +
+          currentData.pux_members.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      });
+    }
+
+    function renderAdminLists() {
+      if (!currentData) return;
+
+      document.getElementById('puxAdminList').innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f9f9f9;">
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">姓名</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">产品/业务</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">PO</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${currentData.pux_members.map(p => `
+              <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px;">${p.name}</td>
+                <td style="padding: 12px;">${p.product_business}</td>
+                <td style="padding: 12px;">${p.po_name}</td>
+                <td style="padding: 12px;">
+                  <button onclick="deletePux('${p.id}')" style="padding: 6px 12px; background: #ff4d4f; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      document.getElementById('backupAdminList').innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f9f9f9;">
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">姓名</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">产品/业务</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">PO</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${currentData.backup_pux.map(p => `
+              <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px;">${p.name}</td>
+                <td style="padding: 12px;">${p.product_business}</td>
+                <td style="padding: 12px;">${p.po_name}</td>
+                <td style="padding: 12px;">
+                  <button onclick="deleteBackup('${p.id}')" style="padding: 6px 12px; background: #ff4d4f; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function savePuxProgress(event) {
+      event.preventDefault();
+      
+      const data = {
+        pux_id: document.getElementById('puxSelect').value,
+        step: parseInt(document.getElementById('stepSelect').value),
+        status: document.getElementById('statusSelect').value,
+        project: document.getElementById('projectInput').value,
+        description: document.getElementById('descriptionInput').value
+      };
+
+      if (!data.pux_id || !data.project) {
+        alert('请选择 PUX 并输入项目名称');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/save_pux_progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('进度保存成功！');
+          document.getElementById('puxForm').reset();
+          loadData();
+        }
+      } catch (error) {
+        console.error('Error saving progress:', error);
+        alert('保存失败，请重试');
+      }
+    }
+
+    async function savePoFeedback(event) {
+      event.preventDefault();
+      
+      const businessMetric = document.querySelector('input[name="businessMetric"]:checked');
+      const collaboration = document.querySelector('input[name="collaboration"]:checked');
+
+      const data = {
+        po_name: document.getElementById('poNameInput').value,
+        pux_id: document.getElementById('puxSelectPo').value,
+        business_metric: businessMetric ? businessMetric.value : '',
+        business_metric_comment: document.getElementById('businessMetricComment').value,
+        collaboration_efficiency: collaboration ? collaboration.value : '',
+        collaboration_efficiency_comment: document.getElementById('collaborationComment').value,
+        project_progress: document.getElementById('projectProgress').value,
+        next_plan: document.getElementById('nextPlan').value,
+        overall_comment: document.getElementById('overallComment').value
+      };
+
+      if (!data.po_name || !data.pux_id) {
+        alert('请输入 PO 姓名并选择 PUX');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/save_po_feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('反馈保存成功！');
+          document.getElementById('poForm').reset();
+          loadData();
+        }
+      } catch (error) {
+        console.error('Error saving feedback:', error);
+        alert('保存失败，请重试');
+      }
+    }
+
+    async function addPux() {
+      const name = document.getElementById('adminPuxName').value;
+      const product = document.getElementById('adminPuxProduct').value;
+      const po = document.getElementById('adminPuxPo').value;
+
+      if (!name || !product || !po) {
+        alert('请填写完整信息');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_pux',
+            payload: { name, product_business: product, po_name: po }
+          })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('添加成功！');
+          document.getElementById('adminPuxName').value = '';
+          document.getElementById('adminPuxProduct').value = '';
+          document.getElementById('adminPuxPo').value = '';
+          loadData();
+        }
+      } catch (error) {
+        console.error('Error adding PUX:', error);
+        alert('添加失败，请重试');
+      }
+    }
+
+    async function deletePux(id) {
+      if (!confirm('确定要删除这个 PUX 成员吗？')) return;
+
+      try {
+        const response = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_pux',
+            payload: { id }
+          })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('删除成功！');
+          loadData();
+        }
+      } catch (error) {
+        console.error('Error deleting PUX:', error);
+        alert('删除失败，请重试');
+      }
+    }
+
+    async function addBackup() {
+      const name = document.getElementById('adminBackupName').value;
+      const product = document.getElementById('adminBackupProduct').value;
+      const po = document.getElementById('adminBackupPo').value;
+
+      if (!name || !product || !po) {
+        alert('请填写完整信息');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_backup',
+            payload: { name, product_business: product, po_name: po }
+          })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('添加成功！');
+          document.getElementById('adminBackupName').value = '';
+          document.getElementById('adminBackupProduct').value = '';
+          document.getElementById('adminBackupPo').value = '';
+          loadData();
+        }
+      } catch (error) {
+        console.error('Error adding backup:', error);
+        alert('添加失败，请重试');
+      }
+    }
+
+    async function deleteBackup(id) {
+      if (!confirm('确定要删除这个备选 PUX 吗？')) return;
+
+      try {
+        const response = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_backup',
+            payload: { id }
+          })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('删除成功！');
+          loadData();
+        }
+      } catch (error) {
+        console.error('Error deleting backup:', error);
+        alert('删除失败，请重试');
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

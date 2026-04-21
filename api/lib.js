@@ -1,49 +1,46 @@
+const fs = require('fs');
+const path = require('path');
 
-const WECOM_WEBHOOK_URL = process.env.WECOM_WEBHOOK_URL || 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=ff12e8b8-473c-4e47-9b5d-973e56de4b0d';
-const FEEDBACK_WEBHOOK_URL = process.env.FEEDBACK_WEBHOOK_URL || 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=e5cf7ba8-6652-4a00-803c-162008b044ba';
+const DATA_PATH = path.join(process.cwd(), 'data', 'pux_data.json');
 
-const HOLIDAYS = [
-    '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05',
-    '2026-06-01',
-    '2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06', '2026-10-07'
-];
-
-function isHoliday() {
-    const now = new Date();
-    const shanghaiOffset = 8 * 60;
-    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-    const shanghaiTime = new Date(utc + shanghaiOffset * 60000);
-    const dateStr = shanghaiTime.toISOString().split('T')[0];
-    return HOLIDAYS.includes(dateStr);
-}
-
-function getShanghaiDate() {
-    const now = new Date();
-    const shanghaiOffset = 8 * 60;
-    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-    return new Date(utc + shanghaiOffset * 60000);
-}
-
-async function sendTextToWeCom(webhookUrl, text) {
-    const fetch = require('node-fetch');
-    const payload = {
-        msgtype: 'text',
-        text: {
-            content: text,
-            mentioned_list: ['@all']
+function ensureDataFile() {
+  if (!fs.existsSync(DATA_PATH)) {
+    const initialData = {
+      pux_members: [],
+      backup_pux: [],
+      po_feedback: [],
+      steps_definition: {
+        step1: {
+          name: "第一步",
+          description: "直接和研发对齐任务"
+        },
+        step2: {
+          name: "第二步",
+          description: "自己产生想法并推进"
+        },
+        step3: {
+          name: "第三步",
+          description: "从想法到 demo 甚至到推广运营"
         }
+      }
     };
-    const res = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (data.errcode !== 0) {
-        throw new Error(`WeCom API error: ${data.errcode} ${data.errmsg}`);
-    }
-    return data;
+    fs.mkdirSync(path.dirname(DATA_PATH), { recursive: true });
+    fs.writeFileSync(DATA_PATH, JSON.stringify(initialData, null, 2));
+  }
 }
 
-module.exports = { WECOM_WEBHOOK_URL, FEEDBACK_WEBHOOK_URL, isHoliday, getShanghaiDate, sendTextToWeCom, HOLIDAYS };
+function readData() {
+  ensureDataFile();
+  return JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+}
 
+function writeData(data) {
+  fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
+}
+
+module.exports = {
+  ensureDataFile,
+  readData,
+  writeData,
+  DATA_PATH
+};

@@ -1,7 +1,7 @@
 {
-  "name": "pux-tracker",
+  "name": "pux-transition-board",
   "version": "1.0.0",
-  "description": "PUX 进化观测站 - 产品设计师转型进度看板",
+  "description": "PUX 转型看板系统",
   "engines": {
     "node": "18.x"
   },

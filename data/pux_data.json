@@ -1,0 +1,225 @@
+{
+  "pux_members": [
+    {
+      "id": "pux_001",
+      "name": "容若",
+      "product_business": "Coohom/AI<|FunctionExecuteResult|>Native",
+      "po_name": "锐仔",
+      "current_step": 1,
+      "status": "in_progress",
+      "steps": {
+        "step1": {
+          "status": "in_progress",
+          "completed_date": null,
+          "project": "",
+          "description": "直接和研发对齐任务"
+        },
+        "step2": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "自己产生想法并推进"
+        },
+        "step3": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "从想法到 demo 甚至到推广运营"
+        }
+      },
+      "last_update": "2026-04-21",
+      "history": []
+    },
+    {
+      "id": "pux_002",
+      "name": "图伊",
+      "product_business": "Coohom/商业增长",
+      "po_name": "锐仔",
+      "current_step": 1,
+      "status": "in_progress",
+      "steps": {
+        "step1": {
+          "status": "in_progress",
+          "completed_date": null,
+          "project": "",
+          "description": "直接和研发对齐任务"
+        },
+        "step2": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "自己产生想法并推进"
+        },
+        "step3": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "从想法到 demo 甚至到推广运营"
+        }
+      },
+      "last_update": "2026-04-21",
+      "history": []
+    },
+    {
+      "id": "pux_003",
+      "name": "沧耳",
+      "product_business": "Aholo平台",
+      "po_name": "邪神",
+      "current_step": 1,
+      "status": "in_progress",
+      "steps": {
+        "step1": {
+          "status": "in_progress",
+          "completed_date": null,
+          "project": "",
+          "description": "直接和研发对齐任务"
+        },
+        "step2": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "自己产生想法并推进"
+        },
+        "step3": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "从想法到 demo 甚至到推广运营"
+        }
+      },
+      "last_update": "2026-04-21",
+      "history": []
+    },
+    {
+      "id": "pux_004",
+      "name": "柠木",
+      "product_business": "Coohom/企业产品",
+      "po_name": "九一",
+      "current_step": 1,
+      "status": "in_progress",
+      "steps": {
+        "step1": {
+          "status": "in_progress",
+          "completed_date": null,
+          "project": "",
+          "description": "直接和研发对齐任务"
+        },
+        "step2": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "自己产生想法并推进"
+        },
+        "step3": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "从想法到 demo 甚至到推广运营"
+        }
+      },
+      "last_update": "2026-04-21",
+      "history": []
+    },
+    {
+      "id": "pux_005",
+      "name": "神乐",
+      "product_business": "酷家乐工具/make",
+      "po_name": "拾厘",
+      "current_step": 1,
+      "status": "in_progress",
+      "steps": {
+        "step1": {
+          "status": "in_progress",
+          "completed_date": null,
+          "project": "",
+          "description": "直接和研发对齐任务"
+        },
+        "step2": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "自己产生想法并推进"
+        },
+        "step3": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "从想法到 demo 甚至到推广运营"
+        }
+      },
+      "last_update": "2026-04-21",
+      "history": []
+    },
+    {
+      "id": "pux_006",
+      "name": "看看",
+      "product_business": "棚拍",
+      "po_name": "努努",
+      "current_step": 1,
+      "status": "in_progress",
+      "steps": {
+        "step1": {
+          "status": "in_progress",
+          "completed_date": null,
+          "project": "",
+          "description": "直接和研发对齐任务"
+        },
+        "step2": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "自己产生想法并推进"
+        },
+        "step3": {
+          "status": "pending",
+          "completed_date": null,
+          "project": "",
+          "description": "从想法到 demo 甚至到推广运营"
+        }
+      },
+      "last_update": "2026-04-21",
+      "history": []
+    }
+  ],
+  "backup_pux": [
+    {
+      "id": "backup_001",
+      "name": "葡萄",
+      "product_business": "酷家乐工具/工业仿真",
+      "po_name": "织墨"
+    },
+    {
+      "id": "backup_002",
+      "name": "瑶一",
+      "product_business": "建筑结构/户型",
+      "po_name": "米兔"
+    },
+    {
+      "id": "backup_003",
+      "name": "雨落",
+      "product_business": "Coohom/商业增长&平台工具",
+      "po_name": "霄凡/锐仔"
+    },
+    {
+      "id": "backup_004",
+      "name": "藜漫",
+      "product_business": "酷家乐工具/KAF（后续可能渲染）",
+      "po_name": "乃量/天哲"
+    }
+  ],
+  "po_feedback": [],
+  "steps_definition": {
+    "step1": {
+      "name": "第一步",
+      "description": "直接和研发对齐任务"
+    },
+    "step2": {
+      "name": "第二步",
+      "description": "自己产生想法并推进"
+    },
+    "step3": {
+      "name": "第三步",
+      "description": "从想法到 demo 甚至到推广运营"
+    }
+  }
+}
