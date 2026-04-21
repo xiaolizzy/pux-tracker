@@ -5,6 +5,11 @@
   "engines": {
     "node": "18.x"
   },
+  "scripts": {
+    "dev": "echo 'This is a Vercel project, use `vercel dev` to run locally'",
+    "build": "echo 'No build step required'",
+    "start": "echo 'This is a Vercel project, deploy to Vercel to run'"
+  },
   "dependencies": {
     "node-fetch": "^2.7.0"
   }
