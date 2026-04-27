@@ -4,7 +4,7 @@
   "description": "PUX panorama dashboard optimized for Vercel deployment",
   "main": "api/pux-data.js",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "npx vercel dev",
