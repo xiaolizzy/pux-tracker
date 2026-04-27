@@ -6,8 +6,10 @@
 
 - `/pux-dashboard`: PUX 全景进化看板
 - `/pux`: PUX 进度同步表单
+- `/admin`: 管理后台，可新增、修改、删除 PUX 成员，维护产品业务和 PO
 - `/api/pux/data`: 获取看板数据
 - `/api/pux/save`: 保存进度并推送企业微信
+- `/api/pux/admin`: 管理后台保存名单和业务信息
 
 ## Vercel 配置
 

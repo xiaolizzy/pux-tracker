@@ -10,6 +10,10 @@
       "destination": "/api/pux-save.js"
     },
     {
+      "source": "/api/pux/admin",
+      "destination": "/api/pux-admin.js"
+    },
+    {
       "source": "/",
       "destination": "/pux-dashboard"
     },
