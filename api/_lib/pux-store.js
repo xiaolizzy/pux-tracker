@@ -17,11 +17,34 @@ function readFallbackData() {
   return normalizeDataShape(JSON.parse(fs.readFileSync(dataPath, 'utf8')));
 }
 
+function cleanText(value) {
+  return String(value || '').replace(/<\|FunctionExecuteResult\|>/g, '');
+}
+
+function sanitizePilot(pilot) {
+  return {
+    ...pilot,
+    name: cleanText(pilot.name),
+    product_line: cleanText(pilot.product_line),
+    po_name: cleanText(pilot.po_name),
+    project: cleanText(pilot.project),
+    execution_process: cleanText(pilot.execution_process),
+    conclusion: cleanText(pilot.conclusion) || '顺利进行',
+  };
+}
+
+function sanitizeDashboardData(data) {
+  return {
+    ...data,
+    pilots: Array.isArray(data.pilots) ? data.pilots.map(sanitizePilot) : [],
+  };
+}
+
 function normalizeDataShape(data) {
-  if (Array.isArray(data.pilots)) return data;
+  if (Array.isArray(data.pilots)) return sanitizeDashboardData(data);
 
   if (Array.isArray(data.pux_members)) {
-    return {
+    return sanitizeDashboardData({
       pilots: data.pux_members.map((member) => ({
         id: member.id,
         name: member.name,
@@ -46,7 +69,7 @@ function normalizeDataShape(data) {
         2: data.steps_definition?.step2?.description || '自己产生想法并推进',
         3: data.steps_definition?.step3?.description || '从想法到Demo甚至推广运营',
       },
-    };
+    });
   }
 
   return {
@@ -127,7 +150,7 @@ async function readData() {
   const data = await readSupabaseData();
   if (data) {
     return {
-      data,
+      data: sanitizeDashboardData(data),
       source: 'supabase',
       writable: true,
     };
@@ -142,17 +165,19 @@ async function readData() {
 }
 
 async function writeData(data) {
+  const cleanData = sanitizeDashboardData(data);
+
   if (!hasSupabaseConfig()) {
     return {
-      data,
+      data: cleanData,
       source: 'fallback-json',
       writable: false,
     };
   }
 
-  const savedData = await writeSupabaseData(data);
+  const savedData = await writeSupabaseData(cleanData);
   return {
-    data: savedData,
+    data: sanitizeDashboardData(savedData),
     source: 'supabase',
     writable: true,
   };
