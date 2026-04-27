@@ -15,15 +15,15 @@
     },
     {
       "source": "/",
-      "destination": "/pux-dashboard"
+      "destination": "/index.html"
     },
     {
       "source": "/pux",
-      "destination": "/pux-tracker/pux_checkin.html"
+      "destination": "/pux.html"
     },
     {
       "source": "/pux-dashboard",
-      "destination": "/pux-tracker/pux_dashboard.html"
+      "destination": "/index.html"
     },
     {
       "source": "/admin",

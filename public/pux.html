@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUX 进度同步</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 24px; color: #1f1f1f; }
+    .container { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    h1 { margin: 0 0 8px; font-size: 26px; text-align: center; }
+    .subtitle { margin: 0 0 24px; text-align: center; color: #595959; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 8px; font-weight: 700; color: #555; }
+    input, select, textarea { width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-size: 15px; font-family: inherit; outline-color: #07c160; }
+    textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+    button { width: 100%; border: 0; border-radius: 8px; background: #07c160; color: #fff; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .pilot-info { display: none; margin-bottom: 18px; background: #f9f9f9; border-radius: 8px; padding: 12px; color: #595959; font-size: 14px; }
+    .message { display: none; margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; }
+    .message.success { display: block; background: #f6ffed; color: #389e0d; }
+    .message.error { display: block; background: #fff1f0; color: #cf1322; }
+    .nav { display: block; margin-top: 18px; text-align: center; color: #07c160; font-weight: 700; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>PUX 进度同步</h1>
+    <p class="subtitle">提交后会同步到看板，并推送企业微信群（如已配置 webhook）。</p>
+
+    <form onsubmit="submitProgress(event)">
+      <div class="form-group">
+        <label for="pilot-select">PUX 成员</label>
+        <select id="pilot-select" required onchange="selectPilot()">
+          <option value="">请选择姓名...</option>
+        </select>
+      </div>
+
+      <div class="pilot-info" id="pilot-info"></div>
+
+      <div class="form-group">
+        <label for="step-select">当前阶段</label>
+        <select id="step-select">
+          <option value="1">Step 1：直接和研发对齐任务</option>
+          <option value="2">Step 2：自己产生想法并推进</option>
+          <option value="3">Step 3：从想法到 Demo / 推广运营</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="status-select">状态</label>
+        <select id="status-select">
+          <option value="in_progress">进行中</option>
+          <option value="completed">已达成该阶段</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="project-name">负责内容 / 关联项目</label>
+        <input id="project-name" required placeholder="例如：AIHom 整个工具">
+      </div>
+
+      <div class="form-group">
+        <label for="execution-process">执行过程 / 收集反馈</label>
+        <textarea id="execution-process" placeholder="描述当前进展、工作量变化、卡点和下一步"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="conclusion-select">结论</label>
+        <select id="conclusion-select">
+          <option value="顺利进行">顺利进行</option>
+          <option value="待观察">待观察</option>
+          <option value="遇到阻碍">遇到阻碍</option>
+          <option value="刚起步">刚起步</option>
+        </select>
+      </div>
+
+      <button id="submit-btn" type="submit">提交进度</button>
+      <div id="message" class="message"></div>
+    </form>
+
+    <a class="nav" href="/">返回看板</a>
+  </main>
+
+  <script>
+    let pilots = [];
+
+    function showMessage(text, type = 'success') {
+      const message = document.getElementById('message');
+      message.textContent = text;
+      message.className = `message ${type}`;
+    }
+
+    async function loadPilots() {
+      const response = await fetch('/api/pux/data', { cache: 'no-store' });
+      const data = await response.json();
+      pilots = Array.isArray(data.pilots) ? data.pilots : [];
+      const select = document.getElementById('pilot-select');
+      select.innerHTML = '<option value="">请选择姓名...</option>' + pilots.map(pilot => (
+        `<option value="${pilot.id}">${pilot.name}</option>`
+      )).join('');
+    }
+
+    function selectPilot() {
+      const id = document.getElementById('pilot-select').value;
+      const pilot = pilots.find(item => item.id === id);
+      const info = document.getElementById('pilot-info');
+      if (!pilot) {
+        info.style.display = 'none';
+        return;
+      }
+      info.style.display = 'block';
+      info.textContent = `产品线：${pilot.product_line || '-'} | PO：${pilot.po_name || '-'}`;
+      document.getElementById('step-select').value = pilot.current_step || 1;
+      document.getElementById('status-select').value = pilot.status || 'in_progress';
+      document.getElementById('project-name').value = pilot.project || '';
+      document.getElementById('execution-process').value = pilot.execution_process || '';
+      document.getElementById('conclusion-select').value = pilot.conclusion || '顺利进行';
+    }
+
+    async function submitProgress(event) {
+      event.preventDefault();
+      const button = document.getElementById('submit-btn');
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/pux/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: document.getElementById('pilot-select').value,
+            step: Number(document.getElementById('step-select').value),
+            status: document.getElementById('status-select').value,
+            project: document.getElementById('project-name').value,
+            execution_process: document.getElementById('execution-process').value,
+            conclusion: document.getElementById('conclusion-select').value,
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || '提交失败');
+        showMessage(result.writable ? '提交成功，看板会自动同步' : '提交成功，但 Supabase 未配置，线上不会持久化', result.writable ? 'success' : 'error');
+        await loadPilots();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    loadPilots().catch(error => showMessage(error.message, 'error'));
+  </script>
+</body>
+</html>

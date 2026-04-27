@@ -1,771 +1,319 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PUX 转型看板</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUX 全景进化看板</title>
+    <style>
+        :root {
+            --primary-color: #07c160;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1f1f1f;
+            --text-sub: #595959;
+            --border-color: #f0f0f0;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); margin: 0; padding: 40px 20px; color: var(--text-main); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
+        .subtitle { color: var(--text-sub); margin-top: 10px; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
+        /* Summary Stats */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--primary-color); }
+        .stat-value { font-size: 36px; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; }
+        .stat-label { font-size: 14px; color: var(--text-sub); }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+        /* Stage Groups */
+        .stage-board { display: grid; gap: 32px; }
+        .stage-section { background: transparent; }
+        .stage-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 16px; }
+        .stage-kicker { color: var(--primary-color); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+        .stage-title { margin-top: 6px; font-size: 22px; font-weight: 800; }
+        .stage-desc { margin-top: 6px; color: var(--text-sub); font-size: 14px; }
+        .stage-count { background: #fff; color: var(--text-sub); padding: 8px 14px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); white-space: nowrap; }
+        .stage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+        .pilot-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .pilot-card[open], .pilot-card:hover { transform: translateY(-3px); }
+        .card-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; }
+        .card-header::-webkit-details-marker { display: none; }
+        .pilot-name { font-size: 18px; font-weight: bold; }
+        .pilot-sub { color: var(--text-sub); font-size: 13px; margin-top: 6px; }
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .badge-step { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+        .badge-status { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .badge-status.warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
 
-    header {
-      text-align: center;
-      color: white;
-      margin-bottom: 30px;
-    }
+        .card-body { padding: 20px; }
+        .info-row { display: flex; margin-bottom: 12px; font-size: 14px; }
+        .info-label { width: 80px; color: var(--text-sub); flex-shrink: 0; }
+        .info-content { color: var(--text-main); font-weight: 500; }
+        
+        .progress-box { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-top: 15px; }
+        .progress-title { font-size: 13px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
+        .progress-text { font-size: 13px; line-height: 1.6; color: #444; }
+        .detail-grid { display: grid; gap: 10px; margin-top: 14px; }
+        .history-toggle { margin-top: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff; }
+        .history-toggle summary { cursor: pointer; padding: 12px; color: var(--text-sub); font-weight: 700; font-size: 13px; }
+        .history-list { padding: 0 12px 12px; display: grid; gap: 10px; }
+        .history-item { border-left: 3px solid var(--primary-color); background: #f9f9f9; padding: 10px 12px; border-radius: 6px; font-size: 13px; color: #444; }
+        .history-date { color: #999; font-size: 12px; margin-bottom: 4px; }
 
-    header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
+        .card-footer { padding: 15px 20px; background: #fafafa; border-top: 1px solid var(--border-color); font-size: 12px; color: #999; display: flex; justify-content: space-between; }
+        .sync-status { margin-top: 12px; font-size: 12px; color: #8c8c8c; }
+        
+        @media (max-width: 980px) {
+            .stage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
 
-    header p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-
-    .nav {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-
-    .nav button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background: white;
-      color: #667eea;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .nav button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .nav button.active {
-      background: #667eea;
-      color: white;
-    }
-
-    .board {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 25px;
-    }
-
-    .pux-card {
-      background: white;
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .pux-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-
-    .pux-name {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #333;
-    }
-
-    .product-info {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .po-info {
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-
-    .steps-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .step {
-      padding: 15px;
-      border-radius: 10px;
-      border-left: 4px solid;
-      background: #f9f9f9;
-      transition: all 0.3s;
-    }
-
-    .step.pending {
-      border-left-color: #ddd;
-      opacity: 0.6;
-    }
-
-    .step.in_progress {
-      border-left-color: #ffa500;
-      background: #fff8e6;
-    }
-
-    .step.completed {
-      border-left-color: #00c853;
-      background: #e8f5e9;
-    }
-
-    .step-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .step-title {
-      font-weight: 600;
-      color: #333;
-    }
-
-    .step-status {
-      font-size: 0.8rem;
-      padding: 3px 10px;
-      border-radius: 15px;
-      font-weight: 500;
-    }
-
-    .step-status.pending {
-      background: #f0f0f0;
-      color: #666;
-    }
-
-    .step-status.in_progress {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .step-status.completed {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .step-description {
-      color: #666;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    .step-project {
-      margin-top: 8px;
-      font-size: 0.85rem;
-      color: #667eea;
-      font-weight: 500;
-    }
-
-    .step-date {
-      font-size: 0.8rem;
-      color: #999;
-      margin-top: 5px;
-    }
-
-    .last-update {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-      font-size: 0.85rem;
-      color: #666;
-    }
-
-    .feedback-section {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 2px solid #f0f0f0;
-    }
-
-    .feedback-title {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    .feedback-item {
-      background: #f8f9fa;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      font-size: 0.85rem;
-    }
-
-    .feedback-metrics {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 8px;
-    }
-
-    .metric {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .metric-label {
-      font-weight: 500;
-      color: #666;
-    }
-
-    .metric-value {
-      font-weight: 600;
-      color: #667eea;
-    }
-
-    .loading {
-      text-align: center;
-      color: white;
-      font-size: 1.2rem;
-      padding: 50px;
-    }
-  </style>
+        @media (max-width: 600px) {
+            .stage-header { align-items: flex-start; flex-direction: column; }
+            .stage-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎯 PUX 转型看板</h1>
-      <p>跟踪从 UED 到 PUX 的三步转型进度</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1>🚀 PUX 全景进化看板</h1>
+            <p class="subtitle">见证从 UED 向 PUX 的华丽转型</p>
+            <p class="sync-status" id="sync-status">正在同步最新数据...</p>
+        </header>
 
-    <div class="nav">
-      <button class="active" onclick="showSection('board')">看板展示</button>
-      <button onclick="showSection('pux-form')">PUX 进度收集</button>
-      <button onclick="showSection('po-form')">PO 协作反馈</button>
-      <button onclick="showSection('admin')">管理后台</button>
-    </div>
-
-    <div id="board" class="section">
-      <div id="board-container" class="board"></div>
-    </div>
-
-    <div id="pux-form" class="section" style="display: none;">
-      <div class="container" style="max-width: 600px; margin: 0 auto;">
-        <div class="pux-card" style="max-width: 100%;">
-          <h2 style="text-align: center; margin-bottom: 20px; color: #333;">📝 PUX 进度收集</h2>
-          <form id="puxForm" onsubmit="savePuxProgress(event)">
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">选择 PUX</label>
-              <select id="puxSelect" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
-                <option value="">请选择...</option>
-              </select>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">当前步骤</label>
-              <select id="stepSelect" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
-                <option value="1">第一步：直接和研发对齐任务</option>
-                <option value="2">第二步：自己产生想法并推进</option>
-                <option value="3">第三步：从想法到 demo 甚至到推广运营</option>
-              </select>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">状态</label>
-              <select id="statusSelect" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
-                <option value="in_progress">进行中</option>
-                <option value="completed">已完成</option>
-              </select>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">关联项目</label>
-              <input type="text" id="projectInput" placeholder="请输入关联项目名称" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">详细说明（可选）</label>
-              <textarea id="descriptionInput" rows="4" placeholder="请输入详细说明" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
-            </div>
-            <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.3s;">提交进度</button>
-          </form>
+        <div class="summary-grid" id="summary-stats">
+            <!-- Stats will be loaded here -->
         </div>
-      </div>
-    </div>
 
-    <div id="po-form" class="section" style="display: none;">
-      <div class="container" style="max-width: 700px; margin: 0 auto;">
-        <div class="pux-card" style="max-width: 100%;">
-          <h2 style="text-align: center; margin-bottom: 20px; color: #333;">💬 PO 协作反馈</h2>
-          <form id="poForm" onsubmit="savePoFeedback(event)">
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">PO 姓名</label>
-              <input type="text" id="poNameInput" placeholder="请输入您的姓名" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">选择 PUX</label>
-              <select id="puxSelectPo" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;">
-                <option value="">请选择...</option>
-              </select>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">1. 业务指标评价</label>
-              <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">负责模块的核心 KPI 是否有正向变化？</p>
-              <div style="display: flex; gap: 15px; margin-bottom: 10px;">
-                <label style="display: flex; align-items: center; gap: 5px;">
-                  <input type="radio" name="businessMetric" value="positive"> 正向变化
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                  <input type="radio" name="businessMetric" value="neutral"> 无变化
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                  <input type="radio" name="businessMetric" value="negative"> 负向变化
-                </label>
-              </div>
-              <textarea id="businessMetricComment" rows="2" placeholder="请输入详细说明（可选）" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">2. 协作效率评价</label>
-              <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">方案产出效率是否显著高于老模式？</p>
-              <div style="display: flex; gap: 15px; margin-bottom: 10px;">
-                <label style="display: flex; align-items: center; gap: 5px;">
-                  <input type="radio" name="collaboration" value="high"> 显著提高
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                  <input type="radio" name="collaboration" value="medium"> 差不多
-                </label>
-                <label style="display: flex; align-items: center; gap: 5px;">
-                  <input type="radio" name="collaboration" value="low"> 反而降低
-                </label>
-              </div>
-              <textarea id="collaborationComment" rows="2" placeholder="请输入详细说明（可选）" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95rem; resize: vertical;"></textarea>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">3. 项目进展</label>
-              <textarea id="projectProgress" rows="3" placeholder="请描述当前项目的进展情况和遇到的问题" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">4. 下一步计划</label>
-              <textarea id="nextPlan" rows="3" placeholder="请描述对 PUX 下一步工作的建议" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">5. 总体评价</label>
-              <textarea id="overallComment" rows="3" placeholder="请输入对 PUX 的总体评价" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical;"></textarea>
-            </div>
-            <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.3s;">提交反馈</button>
-          </form>
+        <div class="stage-board" id="pilot-list">
+            <!-- Cards will be loaded here -->
         </div>
-      </div>
     </div>
 
-    <div id="admin" class="section" style="display: none;">
-      <div class="container" style="max-width: 1200px; margin: 0 auto;">
-        <div class="pux-card" style="max-width: 100%;">
-          <h2 style="text-align: center; margin-bottom: 20px; color: #333;">⚙️ 管理后台</h2>
-          
-          <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
-            <h3 style="margin-bottom: 15px; color: #333;">PUX 成员管理</h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-              <input type="text" id="adminPuxName" placeholder="姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-              <input type="text" id="adminPuxProduct" placeholder="产品/业务" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-              <input type="text" id="adminPuxPo" placeholder="PO 姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-              <button onclick="addPux()" style="padding: 10px 20px; background: #00c853; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">添加</button>
-            </div>
-            <div id="puxAdminList"></div>
-          </div>
+    <script>
+        let latestDataHash = '';
+        let isLoading = false;
 
-          <div>
-            <h3 style="margin-bottom: 15px; color: #333;">备选 PUX 管理</h3>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-              <input type="text" id="adminBackupName" placeholder="姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-              <input type="text" id="adminBackupProduct" placeholder="产品/业务" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-              <input type="text" id="adminBackupPo" placeholder="PO 姓名" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 6px;">
-              <button onclick="addBackup()" style="padding: 10px 20px; background: #00c853; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">添加</button>
-            </div>
-            <div id="backupAdminList"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        function updateSyncStatus(text) {
+            document.getElementById('sync-status').textContent = text;
+        }
 
-  <script>
-    let currentData = null;
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
-    async function loadData() {
-      try {
-        const response = await fetch('/api/get_data');
-        currentData = await response.json();
-        renderBoard();
-        renderPuxSelects();
-        renderAdminLists();
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
-    }
+        function getTimeValue(value) {
+            const time = new Date(value || 0).getTime();
+            return Number.isNaN(time) ? 0 : time;
+        }
 
-    function showSection(sectionId) {
-      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-      document.getElementById(sectionId).style.display = 'block';
-      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-    }
+        function formatStatus(status) {
+            return status === 'completed' ? '已达成阶段' : '进化中';
+        }
 
-    function renderBoard() {
-      const container = document.getElementById('board-container');
-      if (!currentData) {
-        container.innerHTML = '<div class="loading">加载中...</div>';
-        return;
-      }
+        function getStageMeta(step, definitions = {}) {
+            const fallback = {
+                1: {
+                    title: '第一阶段：对齐研发',
+                    desc: '能否直接和研发对任务'
+                },
+                2: {
+                    title: '第二阶段：主动推进',
+                    desc: '能否自己产生想法并推进'
+                },
+                3: {
+                    title: '第三阶段：全链路运营',
+                    desc: '能否从想法到 Demo 甚至推广运营'
+                }
+            };
 
-      container.innerHTML = currentData.pux_members.map(pux => {
-        const feedbacks = currentData.po_feedback.filter(f => f.pux_id === pux.id);
-        
-        return `
-          <div class="pux-card">
-            <div class="card-header">
-              <div>
-                <div class="pux-name">${pux.name}</div>
-                <div class="po-info">PO: ${pux.po_name}</div>
-              </div>
-              <div class="product-info">${pux.product_business}</div>
-            </div>
-            <div class="steps-container">
-              ${renderStep(pux, 1)}
-              ${renderStep(pux, 2)}
-              ${renderStep(pux, 3)}
-            </div>
-            ${feedbacks.length > 0 ? `
-              <div class="feedback-section">
-                <div class="feedback-title">📝 PO 反馈</div>
-                ${feedbacks.slice(-2).map(f => `
-                  <div class="feedback-item">
-                    <div style="font-weight: 600; margin-bottom: 8px; color: #667eea;">${f.po_name} · ${f.date}</div>
-                    <div class="feedback-metrics">
-                      <div class="metric">
-                        <span class="metric-label">业务指标:</span>
-                        <span class="metric-value">${f.business_metric || '-'}</span>
-                      </div>
-                      <div class="metric">
-                        <span class="metric-label">协作效率:</span>
-                        <span class="metric-value">${f.collaboration_efficiency || '-'}</span>
-                      </div>
+            return {
+                title: fallback[step].title,
+                desc: definitions[String(step)] || fallback[step].desc
+            };
+        }
+
+        function getHistoryItems(pilot) {
+            const base = [];
+
+            if (pilot.project || pilot.execution_process || pilot.conclusion) {
+                base.push({
+                    date: pilot.last_update || '',
+                    step: pilot.current_step,
+                    status: pilot.status,
+                    project: pilot.project,
+                    execution_process: pilot.execution_process,
+                    conclusion: pilot.conclusion
+                });
+            }
+
+            const history = Array.isArray(pilot.history) ? pilot.history : [];
+            return [...base, ...history]
+                .filter(item => item.project || item.execution_process || item.conclusion || item.action)
+                .sort((a, b) => getTimeValue(b.date) - getTimeValue(a.date));
+        }
+
+        function renderHistory(pilot) {
+            const items = getHistoryItems(pilot);
+            if (!items.length) {
+                return '<p class="progress-text">暂无历史反馈记录</p>';
+            }
+
+            return `
+                <details class="history-toggle">
+                    <summary>历史反馈记录（${items.length}）</summary>
+                    <div class="history-list">
+                        ${items.map(item => `
+                            <div class="history-item">
+                                <div class="history-date">${escapeHtml(item.date || '未记录日期')} · Step ${escapeHtml(item.step || item.current_step || pilot.current_step || 1)}</div>
+                                <div><strong>${escapeHtml(item.project || item.action || '阶段进展')}</strong></div>
+                                <div>${escapeHtml(item.execution_process || item.description || '暂无过程描述')}</div>
+                                <div>结论：${escapeHtml(item.conclusion || '暂无')}</div>
+                            </div>
+                        `).join('')}
                     </div>
-                    ${f.project_progress ? `<div style="margin-top: 8px; color: #666;">${f.project_progress}</div>` : ''}
-                  </div>
-                `).join('')}
-              </div>
-            ` : ''}
-            <div class="last-update">最后更新: ${pux.last_update}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderStep(pux, step) {
-      const stepData = pux.steps[`step${step}`];
-      const statusText = {
-        pending: '待开始',
-        in_progress: '进行中',
-        completed: '已完成'
-      };
-
-      return `
-        <div class="step ${stepData.status}">
-          <div class="step-header">
-            <div class="step-title">${currentData.steps_definition[`step${step}`].name}</div>
-            <div class="step-status ${stepData.status}">${statusText[stepData.status]}</div>
-          </div>
-          <div class="step-description">${currentData.steps_definition[`step${step}`].description}</div>
-          ${stepData.project ? `<div class="step-project">📦 ${stepData.project}</div>` : ''}
-          ${stepData.completed_date ? `<div class="step-date">✅ 完成于 ${stepData.completed_date}</div>` : ''}
-        </div>
-      `;
-    }
-
-    function renderPuxSelects() {
-      if (!currentData) return;
-
-      const selects = ['puxSelect', 'puxSelectPo'];
-      selects.forEach(id => {
-        const select = document.getElementById(id);
-        select.innerHTML = '<option value="">请选择...</option>' +
-          currentData.pux_members.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-      });
-    }
-
-    function renderAdminLists() {
-      if (!currentData) return;
-
-      document.getElementById('puxAdminList').innerHTML = `
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #f9f9f9;">
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">姓名</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">产品/业务</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">PO</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${currentData.pux_members.map(p => `
-              <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px;">${p.name}</td>
-                <td style="padding: 12px;">${p.product_business}</td>
-                <td style="padding: 12px;">${p.po_name}</td>
-                <td style="padding: 12px;">
-                  <button onclick="deletePux('${p.id}')" style="padding: 6px 12px; background: #ff4d4f; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-
-      document.getElementById('backupAdminList').innerHTML = `
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #f9f9f9;">
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">姓名</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">产品/业务</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">PO</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${currentData.backup_pux.map(p => `
-              <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px;">${p.name}</td>
-                <td style="padding: 12px;">${p.product_business}</td>
-                <td style="padding: 12px;">${p.po_name}</td>
-                <td style="padding: 12px;">
-                  <button onclick="deleteBackup('${p.id}')" style="padding: 6px 12px; background: #ff4d4f; color: white; border: none; border-radius: 4px; cursor: pointer;">删除</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    async function savePuxProgress(event) {
-      event.preventDefault();
-      
-      const data = {
-        pux_id: document.getElementById('puxSelect').value,
-        step: parseInt(document.getElementById('stepSelect').value),
-        status: document.getElementById('statusSelect').value,
-        project: document.getElementById('projectInput').value,
-        description: document.getElementById('descriptionInput').value
-      };
-
-      if (!data.pux_id || !data.project) {
-        alert('请选择 PUX 并输入项目名称');
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/save_pux_progress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-          alert('进度保存成功！');
-          document.getElementById('puxForm').reset();
-          loadData();
+                </details>
+            `;
         }
-      } catch (error) {
-        console.error('Error saving progress:', error);
-        alert('保存失败，请重试');
-      }
-    }
 
-    async function savePoFeedback(event) {
-      event.preventDefault();
-      
-      const businessMetric = document.querySelector('input[name="businessMetric"]:checked');
-      const collaboration = document.querySelector('input[name="collaboration"]:checked');
+        function renderPilotCard(pilot) {
+            const conclusionClass = pilot.conclusion === '顺利进行' ? '' : 'warning';
+            const historyCount = getHistoryItems(pilot).length;
 
-      const data = {
-        po_name: document.getElementById('poNameInput').value,
-        pux_id: document.getElementById('puxSelectPo').value,
-        business_metric: businessMetric ? businessMetric.value : '',
-        business_metric_comment: document.getElementById('businessMetricComment').value,
-        collaboration_efficiency: collaboration ? collaboration.value : '',
-        collaboration_efficiency_comment: document.getElementById('collaborationComment').value,
-        project_progress: document.getElementById('projectProgress').value,
-        next_plan: document.getElementById('nextPlan').value,
-        overall_comment: document.getElementById('overallComment').value
-      };
-
-      if (!data.po_name || !data.pux_id) {
-        alert('请输入 PO 姓名并选择 PUX');
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/save_po_feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-          alert('反馈保存成功！');
-          document.getElementById('poForm').reset();
-          loadData();
+            return `
+                <details class="pilot-card">
+                    <summary class="card-header">
+                        <div>
+                            <div class="pilot-name">${escapeHtml(pilot.name)}</div>
+                            <div class="pilot-sub">${escapeHtml(pilot.product_line)} · PO：${escapeHtml(pilot.po_name)}</div>
+                        </div>
+                        <span class="badge badge-step">Step ${escapeHtml(pilot.current_step)}</span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-label">当前阶段</div>
+                            <div class="info-content">Step ${escapeHtml(pilot.current_step)} · ${escapeHtml(formatStatus(pilot.status))}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">当前结论</div>
+                            <div class="info-content">
+                                <span class="badge badge-status ${conclusionClass}">${escapeHtml(pilot.conclusion || '顺利进行')}</span>
+                            </div>
+                        </div>
+                        <div class="progress-box">
+                            <div class="progress-title">最新收集反馈：${escapeHtml(pilot.project || '-')}</div>
+                            <div class="progress-text">${escapeHtml(pilot.execution_process || '暂无详细执行过程描述...')}</div>
+                        </div>
+                        <div class="detail-grid">
+                            <div class="info-row">
+                                <div class="info-label">更新时间</div>
+                                <div class="info-content">${escapeHtml(pilot.last_update || '-')}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">反馈数量</div>
+                                <div class="info-content">${historyCount} 条</div>
+                            </div>
+                        </div>
+                        ${renderHistory(pilot)}
+                    </div>
+                    <div class="card-footer">
+                        <span>更新于：${escapeHtml(pilot.last_update || '-')}</span>
+                        <span>${pilot.status === 'completed' ? '已达成阶段' : '进化中'}</span>
+                    </div>
+                </details>
+            `;
         }
-      } catch (error) {
-        console.error('Error saving feedback:', error);
-        alert('保存失败，请重试');
-      }
-    }
 
-    async function addPux() {
-      const name = document.getElementById('adminPuxName').value;
-      const product = document.getElementById('adminPuxProduct').value;
-      const po = document.getElementById('adminPuxPo').value;
+        function renderDashboard(data) {
+            // 1. Render Summary Stats
+            const stats = {
+                total: data.pilots.length,
+                step1: data.pilots.filter(p => p.current_step == 1).length,
+                step2: data.pilots.filter(p => p.current_step == 2).length,
+                step3: data.pilots.filter(p => p.current_step == 3).length
+            };
 
-      if (!name || !product || !po) {
-        alert('请填写完整信息');
-        return;
-      }
+            const summaryHtml = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-label">试点成员总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.step1}</div>
+                    <div class="stat-label">第一阶段：对齐研发</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.step2}</div>
+                    <div class="stat-label">第二阶段：主动推进</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.step3}</div>
+                    <div class="stat-label">第三阶段：全链路运营</div>
+                </div>
+            `;
+            document.getElementById('summary-stats').innerHTML = summaryHtml;
 
-      try {
-        const response = await fetch('/api/admin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'add_pux',
-            payload: { name, product_business: product, po_name: po }
-          })
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-          alert('添加成功！');
-          document.getElementById('adminPuxName').value = '';
-          document.getElementById('adminPuxProduct').value = '';
-          document.getElementById('adminPuxPo').value = '';
-          loadData();
+            // 2. Render stage groups. Members and histories are ordered from newest to oldest.
+            const listHtml = [1, 2, 3].map(step => {
+                const stageMeta = getStageMeta(step, data.steps_definition || {});
+                const pilots = data.pilots
+                    .filter(pilot => Number(pilot.current_step || 1) === step)
+                    .sort((a, b) => getTimeValue(b.last_update) - getTimeValue(a.last_update));
+
+                return `
+                    <section class="stage-section">
+                        <div class="stage-header">
+                            <div>
+                                <div class="stage-kicker">Stage ${step}</div>
+                                <div class="stage-title">${escapeHtml(stageMeta.title)}</div>
+                                <div class="stage-desc">${escapeHtml(stageMeta.desc)}</div>
+                            </div>
+                            <div class="stage-count">${pilots.length} 位 PUX</div>
+                        </div>
+                        <div class="stage-grid">
+                            ${pilots.length ? pilots.map(renderPilotCard).join('') : '<div class="progress-box">当前阶段暂无 PUX</div>'}
+                        </div>
+                    </section>
+                `;
+            }).join('');
+            document.getElementById('pilot-list').innerHTML = listHtml;
         }
-      } catch (error) {
-        console.error('Error adding PUX:', error);
-        alert('添加失败，请重试');
-      }
-    }
 
-    async function deletePux(id) {
-      if (!confirm('确定要删除这个 PUX 成员吗？')) return;
+        async function loadDashboard({ force = false } = {}) {
+            if (isLoading) return;
+            isLoading = true;
 
-      try {
-        const response = await fetch('/api/admin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'delete_pux',
-            payload: { id }
-          })
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-          alert('删除成功！');
-          loadData();
+            try {
+                const response = await fetch('/api/pux/data', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`数据同步失败：${response.status}`);
+                const data = await response.json();
+                const nextHash = JSON.stringify(data);
+
+                if (force || nextHash !== latestDataHash) {
+                    latestDataHash = nextHash;
+                    renderDashboard(data);
+                }
+
+                updateSyncStatus(`已同步最新数据 · ${new Date().toLocaleTimeString()}`);
+            } catch (error) {
+                updateSyncStatus(`${error.message || '同步失败'}，稍后自动重试`);
+            } finally {
+                isLoading = false;
+            }
         }
-      } catch (error) {
-        console.error('Error deleting PUX:', error);
-        alert('删除失败，请重试');
-      }
-    }
 
-    async function addBackup() {
-      const name = document.getElementById('adminBackupName').value;
-      const product = document.getElementById('adminBackupProduct').value;
-      const po = document.getElementById('adminBackupPo').value;
-
-      if (!name || !product || !po) {
-        alert('请填写完整信息');
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/admin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'add_backup',
-            payload: { name, product_business: product, po_name: po }
-          })
+        loadDashboard({ force: true });
+        // Vercel-friendly realtime: poll frequently and repaint only when data changes.
+        setInterval(() => loadDashboard(), 5000);
+        window.addEventListener('focus', () => loadDashboard({ force: true }));
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) loadDashboard({ force: true });
         });
-        
-        const result = await response.json();
-        if (result.success) {
-          alert('添加成功！');
-          document.getElementById('adminBackupName').value = '';
-          document.getElementById('adminBackupProduct').value = '';
-          document.getElementById('adminBackupPo').value = '';
-          loadData();
-        }
-      } catch (error) {
-        console.error('Error adding backup:', error);
-        alert('添加失败，请重试');
-      }
-    }
-
-    async function deleteBackup(id) {
-      if (!confirm('确定要删除这个备选 PUX 吗？')) return;
-
-      try {
-        const response = await fetch('/api/admin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'delete_backup',
-            payload: { id }
-          })
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-          alert('删除成功！');
-          loadData();
-        }
-      } catch (error) {
-        console.error('Error deleting backup:', error);
-        alert('删除失败，请重试');
-      }
-    }
-
-    loadData();
-  </script>
+    </script>
 </body>
 </html>
