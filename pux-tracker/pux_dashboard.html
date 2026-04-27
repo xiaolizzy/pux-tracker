@@ -25,12 +25,21 @@
         .stat-value { font-size: 36px; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; }
         .stat-label { font-size: 14px; color: var(--text-sub); }
 
-        /* Kanban Grid */
-        .kanban-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        /* Stage Groups */
+        .stage-board { display: grid; gap: 32px; }
+        .stage-section { background: transparent; }
+        .stage-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 16px; }
+        .stage-kicker { color: var(--primary-color); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+        .stage-title { margin-top: 6px; font-size: 22px; font-weight: 800; }
+        .stage-desc { margin-top: 6px; color: var(--text-sub); font-size: 14px; }
+        .stage-count { background: #fff; color: var(--text-sub); padding: 8px 14px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); white-space: nowrap; }
+        .stage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
         .pilot-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .pilot-card:hover { transform: translateY(-5px); }
-        .card-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .pilot-card[open], .pilot-card:hover { transform: translateY(-3px); }
+        .card-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; }
+        .card-header::-webkit-details-marker { display: none; }
         .pilot-name { font-size: 18px; font-weight: bold; }
+        .pilot-sub { color: var(--text-sub); font-size: 13px; margin-top: 6px; }
         .badge { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         .badge-step { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
         .badge-status { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
@@ -43,13 +52,24 @@
         
         .progress-box { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-top: 15px; }
         .progress-title { font-size: 13px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
-        .progress-text { font-size: 13px; line-height: 1.6; color: #444; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .progress-text { font-size: 13px; line-height: 1.6; color: #444; }
+        .detail-grid { display: grid; gap: 10px; margin-top: 14px; }
+        .history-toggle { margin-top: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff; }
+        .history-toggle summary { cursor: pointer; padding: 12px; color: var(--text-sub); font-weight: 700; font-size: 13px; }
+        .history-list { padding: 0 12px 12px; display: grid; gap: 10px; }
+        .history-item { border-left: 3px solid var(--primary-color); background: #f9f9f9; padding: 10px 12px; border-radius: 6px; font-size: 13px; color: #444; }
+        .history-date { color: #999; font-size: 12px; margin-bottom: 4px; }
 
         .card-footer { padding: 15px 20px; background: #fafafa; border-top: 1px solid var(--border-color); font-size: 12px; color: #999; display: flex; justify-content: space-between; }
         .sync-status { margin-top: 12px; font-size: 12px; color: #8c8c8c; }
         
+        @media (max-width: 980px) {
+            .stage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
         @media (max-width: 600px) {
-            .kanban-grid { grid-template-columns: 1fr; }
+            .stage-header { align-items: flex-start; flex-direction: column; }
+            .stage-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -65,7 +85,7 @@
             <!-- Stats will be loaded here -->
         </div>
 
-        <div class="kanban-grid" id="pilot-list">
+        <div class="stage-board" id="pilot-list">
             <!-- Cards will be loaded here -->
         </div>
     </div>
@@ -76,6 +96,137 @@
 
         function updateSyncStatus(text) {
             document.getElementById('sync-status').textContent = text;
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getTimeValue(value) {
+            const time = new Date(value || 0).getTime();
+            return Number.isNaN(time) ? 0 : time;
+        }
+
+        function formatStatus(status) {
+            return status === 'completed' ? '已达成阶段' : '进化中';
+        }
+
+        function getStageMeta(step, definitions = {}) {
+            const fallback = {
+                1: {
+                    title: '第一阶段：对齐研发',
+                    desc: '能否直接和研发对任务'
+                },
+                2: {
+                    title: '第二阶段：主动推进',
+                    desc: '能否自己产生想法并推进'
+                },
+                3: {
+                    title: '第三阶段：全链路运营',
+                    desc: '能否从想法到 Demo 甚至推广运营'
+                }
+            };
+
+            return {
+                title: fallback[step].title,
+                desc: definitions[String(step)] || fallback[step].desc
+            };
+        }
+
+        function getHistoryItems(pilot) {
+            const base = [];
+
+            if (pilot.project || pilot.execution_process || pilot.conclusion) {
+                base.push({
+                    date: pilot.last_update || '',
+                    step: pilot.current_step,
+                    status: pilot.status,
+                    project: pilot.project,
+                    execution_process: pilot.execution_process,
+                    conclusion: pilot.conclusion
+                });
+            }
+
+            const history = Array.isArray(pilot.history) ? pilot.history : [];
+            return [...base, ...history]
+                .filter(item => item.project || item.execution_process || item.conclusion || item.action)
+                .sort((a, b) => getTimeValue(b.date) - getTimeValue(a.date));
+        }
+
+        function renderHistory(pilot) {
+            const items = getHistoryItems(pilot);
+            if (!items.length) {
+                return '<p class="progress-text">暂无历史反馈记录</p>';
+            }
+
+            return `
+                <details class="history-toggle">
+                    <summary>历史反馈记录（${items.length}）</summary>
+                    <div class="history-list">
+                        ${items.map(item => `
+                            <div class="history-item">
+                                <div class="history-date">${escapeHtml(item.date || '未记录日期')} · Step ${escapeHtml(item.step || item.current_step || pilot.current_step || 1)}</div>
+                                <div><strong>${escapeHtml(item.project || item.action || '阶段进展')}</strong></div>
+                                <div>${escapeHtml(item.execution_process || item.description || '暂无过程描述')}</div>
+                                <div>结论：${escapeHtml(item.conclusion || '暂无')}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </details>
+            `;
+        }
+
+        function renderPilotCard(pilot) {
+            const conclusionClass = pilot.conclusion === '顺利进行' ? '' : 'warning';
+            const historyCount = getHistoryItems(pilot).length;
+
+            return `
+                <details class="pilot-card">
+                    <summary class="card-header">
+                        <div>
+                            <div class="pilot-name">${escapeHtml(pilot.name)}</div>
+                            <div class="pilot-sub">${escapeHtml(pilot.product_line)} · PO：${escapeHtml(pilot.po_name)}</div>
+                        </div>
+                        <span class="badge badge-step">Step ${escapeHtml(pilot.current_step)}</span>
+                    </summary>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-label">当前阶段</div>
+                            <div class="info-content">Step ${escapeHtml(pilot.current_step)} · ${escapeHtml(formatStatus(pilot.status))}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">当前结论</div>
+                            <div class="info-content">
+                                <span class="badge badge-status ${conclusionClass}">${escapeHtml(pilot.conclusion || '顺利进行')}</span>
+                            </div>
+                        </div>
+                        <div class="progress-box">
+                            <div class="progress-title">最新收集反馈：${escapeHtml(pilot.project || '-')}</div>
+                            <div class="progress-text">${escapeHtml(pilot.execution_process || '暂无详细执行过程描述...')}</div>
+                        </div>
+                        <div class="detail-grid">
+                            <div class="info-row">
+                                <div class="info-label">更新时间</div>
+                                <div class="info-content">${escapeHtml(pilot.last_update || '-')}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">反馈数量</div>
+                                <div class="info-content">${historyCount} 条</div>
+                            </div>
+                        </div>
+                        ${renderHistory(pilot)}
+                    </div>
+                    <div class="card-footer">
+                        <span>更新于：${escapeHtml(pilot.last_update || '-')}</span>
+                        <span>${pilot.status === 'completed' ? '已达成阶段' : '进化中'}</span>
+                    </div>
+                </details>
+            `;
         }
 
         function renderDashboard(data) {
@@ -107,40 +258,27 @@
             `;
             document.getElementById('summary-stats').innerHTML = summaryHtml;
 
-            // 2. Render Pilot Cards
-            const listHtml = data.pilots.map(pilot => {
-                const conclusionClass = pilot.conclusion === '顺利进行' ? '' : 'warning';
+            // 2. Render stage groups. Members and histories are ordered from newest to oldest.
+            const listHtml = [1, 2, 3].map(step => {
+                const stageMeta = getStageMeta(step, data.steps_definition || {});
+                const pilots = data.pilots
+                    .filter(pilot => Number(pilot.current_step || 1) === step)
+                    .sort((a, b) => getTimeValue(b.last_update) - getTimeValue(a.last_update));
+
                 return `
-                    <div class="pilot-card">
-                        <div class="card-header">
-                            <div class="pilot-name">${pilot.name}</div>
-                            <span class="badge badge-step">Step ${pilot.current_step}</span>
+                    <section class="stage-section">
+                        <div class="stage-header">
+                            <div>
+                                <div class="stage-kicker">Stage ${step}</div>
+                                <div class="stage-title">${escapeHtml(stageMeta.title)}</div>
+                                <div class="stage-desc">${escapeHtml(stageMeta.desc)}</div>
+                            </div>
+                            <div class="stage-count">${pilots.length} 位 PUX</div>
                         </div>
-                        <div class="card-body">
-                            <div class="info-row">
-                                <div class="info-label">产品线</div>
-                                <div class="info-content">${pilot.product_line}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">对应 PO</div>
-                                <div class="info-content">${pilot.po_name}</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">当前结论</div>
-                                <div class="info-content">
-                                    <span class="badge badge-status ${conclusionClass}">${pilot.conclusion || '顺利进行'}</span>
-                                </div>
-                            </div>
-                            <div class="progress-box">
-                                <div class="progress-title">最新进展：${pilot.project || '-'}</div>
-                                <div class="progress-text">${pilot.execution_process || '暂无详细执行过程描述...'}</div>
-                            </div>
+                        <div class="stage-grid">
+                            ${pilots.length ? pilots.map(renderPilotCard).join('') : '<div class="progress-box">当前阶段暂无 PUX</div>'}
                         </div>
-                        <div class="card-footer">
-                            <span>更新于：${pilot.last_update}</span>
-                            <span>${pilot.status === 'completed' ? '✅ 已达成阶段' : '⏳ 进化中'}</span>
-                        </div>
-                    </div>
+                    </section>
                 `;
             }).join('');
             document.getElementById('pilot-list').innerHTML = listHtml;
