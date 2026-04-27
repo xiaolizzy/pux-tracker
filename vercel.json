@@ -1,7 +1,29 @@
 {
+  "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1.js" },
-    { "source": "/", "destination": "/public/index.html" },
-    { "source": "/(.*)", "destination": "/public/$1" }
+    {
+      "source": "/api/pux/data",
+      "destination": "/api/pux-data.js"
+    },
+    {
+      "source": "/api/pux/save",
+      "destination": "/api/pux-save.js"
+    },
+    {
+      "source": "/",
+      "destination": "/pux-dashboard"
+    },
+    {
+      "source": "/pux",
+      "destination": "/pux-tracker/pux_checkin.html"
+    },
+    {
+      "source": "/pux-dashboard",
+      "destination": "/pux-tracker/pux_dashboard.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    }
   ]
 }

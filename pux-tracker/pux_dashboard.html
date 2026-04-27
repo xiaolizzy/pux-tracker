@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUX 全景进化看板</title>
+    <style>
+        :root {
+            --primary-color: #07c160;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #1f1f1f;
+            --text-sub: #595959;
+            --border-color: #f0f0f0;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); margin: 0; padding: 40px 20px; color: var(--text-main); }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { margin: 0; font-size: 32px; letter-spacing: 1px; }
+        .subtitle { color: var(--text-sub); margin-top: 10px; }
+
+        /* Summary Stats */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--primary-color); }
+        .stat-value { font-size: 36px; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; }
+        .stat-label { font-size: 14px; color: var(--text-sub); }
+
+        /* Kanban Grid */
+        .kanban-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .pilot-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .pilot-card:hover { transform: translateY(-5px); }
+        .card-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .pilot-name { font-size: 18px; font-weight: bold; }
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .badge-step { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+        .badge-status { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .badge-status.warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+
+        .card-body { padding: 20px; }
+        .info-row { display: flex; margin-bottom: 12px; font-size: 14px; }
+        .info-label { width: 80px; color: var(--text-sub); flex-shrink: 0; }
+        .info-content { color: var(--text-main); font-weight: 500; }
+        
+        .progress-box { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-top: 15px; }
+        .progress-title { font-size: 13px; color: var(--text-sub); margin-bottom: 8px; font-weight: bold; }
+        .progress-text { font-size: 13px; line-height: 1.6; color: #444; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .card-footer { padding: 15px 20px; background: #fafafa; border-top: 1px solid var(--border-color); font-size: 12px; color: #999; display: flex; justify-content: space-between; }
+        .sync-status { margin-top: 12px; font-size: 12px; color: #8c8c8c; }
+        
+        @media (max-width: 600px) {
+            .kanban-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 PUX 全景进化看板</h1>
+            <p class="subtitle">见证从 UED 向 PUX 的华丽转型</p>
+            <p class="sync-status" id="sync-status">正在同步最新数据...</p>
+        </header>
+
+        <div class="summary-grid" id="summary-stats">
+            <!-- Stats will be loaded here -->
+        </div>
+
+        <div class="kanban-grid" id="pilot-list">
+            <!-- Cards will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        let latestDataHash = '';
+        let isLoading = false;
+
+        function updateSyncStatus(text) {
+            document.getElementById('sync-status').textContent = text;
+        }
+
+        function renderDashboard(data) {
+            // 1. Render Summary Stats
+            const stats = {
+                total: data.pilots.length,
+                step1: data.pilots.filter(p => p.current_step == 1).length,
+                step2: data.pilots.filter(p => p.current_step == 2).length,
+                step3: data.pilots.filter(p => p.current_step == 3).length
+            };
+
+            const summaryHtml = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-label">试点成员总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.step1}</div>
+                    <div class="stat-label">第一阶段：对齐研发</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.step2}</div>
+                    <div class="stat-label">第二阶段：主动推进</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.step3}</div>
+                    <div class="stat-label">第三阶段：全链路运营</div>
+                </div>
+            `;
+            document.getElementById('summary-stats').innerHTML = summaryHtml;
+
+            // 2. Render Pilot Cards
+            const listHtml = data.pilots.map(pilot => {
+                const conclusionClass = pilot.conclusion === '顺利进行' ? '' : 'warning';
+                return `
+                    <div class="pilot-card">
+                        <div class="card-header">
+                            <div class="pilot-name">${pilot.name}</div>
+                            <span class="badge badge-step">Step ${pilot.current_step}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <div class="info-label">产品线</div>
+                                <div class="info-content">${pilot.product_line}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">对应 PO</div>
+                                <div class="info-content">${pilot.po_name}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">当前结论</div>
+                                <div class="info-content">
+                                    <span class="badge badge-status ${conclusionClass}">${pilot.conclusion || '顺利进行'}</span>
+                                </div>
+                            </div>
+                            <div class="progress-box">
+                                <div class="progress-title">最新进展：${pilot.project || '-'}</div>
+                                <div class="progress-text">${pilot.execution_process || '暂无详细执行过程描述...'}</div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span>更新于：${pilot.last_update}</span>
+                            <span>${pilot.status === 'completed' ? '✅ 已达成阶段' : '⏳ 进化中'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('pilot-list').innerHTML = listHtml;
+        }
+
+        async function loadDashboard({ force = false } = {}) {
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                const response = await fetch('/api/pux/data', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`数据同步失败：${response.status}`);
+                const data = await response.json();
+                const nextHash = JSON.stringify(data);
+
+                if (force || nextHash !== latestDataHash) {
+                    latestDataHash = nextHash;
+                    renderDashboard(data);
+                }
+
+                updateSyncStatus(`已同步最新数据 · ${new Date().toLocaleTimeString()}`);
+            } catch (error) {
+                updateSyncStatus(`${error.message || '同步失败'}，稍后自动重试`);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        loadDashboard({ force: true });
+        // Vercel-friendly realtime: poll frequently and repaint only when data changes.
+        setInterval(() => loadDashboard(), 5000);
+        window.addEventListener('focus', () => loadDashboard({ force: true }));
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) loadDashboard({ force: true });
+        });
+    </script>
+</body>
+</html>
