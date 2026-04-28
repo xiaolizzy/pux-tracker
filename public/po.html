@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PO 反馈收集</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 24px; color: #1f1f1f; }
+    .container { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    h1 { margin: 0 0 8px; font-size: 26px; text-align: center; }
+    .subtitle { margin: 0 0 24px; text-align: center; color: #595959; line-height: 1.6; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 8px; font-weight: 700; color: #555; }
+    input, select, textarea { width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-size: 15px; font-family: inherit; outline-color: #07c160; }
+    textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
+    button { width: 100%; border: 0; border-radius: 8px; background: #07c160; color: #fff; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .pilot-info { display: none; margin-bottom: 18px; background: #f9f9f9; border-radius: 8px; padding: 12px; color: #595959; font-size: 14px; line-height: 1.6; }
+    .message { display: none; margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; }
+    .message.success { display: block; background: #f6ffed; color: #389e0d; }
+    .message.error { display: block; background: #fff1f0; color: #cf1322; }
+    .nav { display: flex; justify-content: center; gap: 18px; margin-top: 18px; }
+    .nav a { color: #07c160; font-weight: 700; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>PO 反馈收集</h1>
+    <p class="subtitle">用于收集 PO 对 PUX 试点协作的评价。提交后会同步到看板的对应 PUX 卡片中。</p>
+
+    <form onsubmit="submitPoFeedback(event)">
+      <div class="form-group">
+        <label for="pilot-select">对应 PUX 成员</label>
+        <select id="pilot-select" required onchange="selectPilot()">
+          <option value="">请选择姓名...</option>
+        </select>
+      </div>
+
+      <div class="pilot-info" id="pilot-info"></div>
+
+      <div class="form-group">
+        <label for="reviewer-name">评价人（可选）</label>
+        <input id="reviewer-name" placeholder="例如：锐仔">
+      </div>
+
+      <div class="form-group">
+        <label for="business-module-goal">明确 PUX 对应的业务模块和目标 *</label>
+        <textarea id="business-module-goal" required placeholder="例如：负责某业务模块的体验升级，目标是提升转化/效率/满意度等"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="resource-coordination">双方磨合 / 协调资源</label>
+        <textarea id="resource-coordination" placeholder="描述协作中是否顺畅、资源协调是否充分、卡点在哪里"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="collaboration-model">PUX 与 PO 能否形成稳定的协作模式 *</label>
+        <textarea id="collaboration-model" required placeholder="描述目前协作节奏、任务分工、决策链路是否稳定"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="continue-willingness">双方是否愿意继续这种合作方式 *</label>
+        <select id="continue-willingness" required>
+          <option value="">请选择...</option>
+          <option value="愿意继续">愿意继续</option>
+          <option value="需要调整后继续">需要调整后继续</option>
+          <option value="暂不建议继续">暂不建议继续</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="kpi-change">业务指标：负责模块的核心 KPI 是否有正向变化</label>
+        <textarea id="kpi-change" placeholder="例如：有明显正向变化 / 暂未观察到 / 指标口径待明确，并补充原因"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="efficiency-change">协作效率：方案产出效率是否显著高于老模式</label>
+        <textarea id="efficiency-change" placeholder="例如：需求理解更快、方案反复减少、落地节奏更顺等"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="milestone-summary">里程碑评估 / 补充说明</label>
+        <textarea id="milestone-summary" placeholder="总结当前阶段是否达成预期，以及建议下一步怎么调整"></textarea>
+      </div>
+
+      <button id="submit-btn" type="submit">提交 PO 反馈</button>
+      <div id="message" class="message"></div>
+    </form>
+
+    <div class="nav">
+      <a href="/pux-dashboard">返回看板</a>
+      <a href="/pux">PUX 自报入口</a>
+    </div>
+  </main>
+
+  <script>
+    let pilots = [];
+
+    function showMessage(text, type = 'success') {
+      const message = document.getElementById('message');
+      message.textContent = text;
+      message.className = `message ${type}`;
+    }
+
+    async function loadPilots() {
+      const response = await fetch('/api/pux/data', { cache: 'no-store' });
+      if (!response.ok) throw new Error('加载 PUX 名单失败');
+      const data = await response.json();
+      pilots = Array.isArray(data.pilots) ? data.pilots : [];
+      const select = document.getElementById('pilot-select');
+      select.innerHTML = '<option value="">请选择姓名...</option>' + pilots.map(pilot => (
+        `<option value="${pilot.id}">${pilot.name} · PO：${pilot.po_name || '-'}</option>`
+      )).join('');
+    }
+
+    function selectPilot() {
+      const id = document.getElementById('pilot-select').value;
+      const pilot = pilots.find(item => item.id === id);
+      const info = document.getElementById('pilot-info');
+      if (!pilot) {
+        info.style.display = 'none';
+        return;
+      }
+
+      info.style.display = 'block';
+      info.textContent = `产品线：${pilot.product_line || '-'} | 对应 PO：${pilot.po_name || '-'} | 当前阶段：Step ${pilot.current_step || 1}`;
+      document.getElementById('reviewer-name').value = pilot.po_name || '';
+    }
+
+    async function submitPoFeedback(event) {
+      event.preventDefault();
+      const button = document.getElementById('submit-btn');
+      button.disabled = true;
+
+      try {
+        const response = await fetch('/api/pux/po-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: document.getElementById('pilot-select').value,
+            reviewer_name: document.getElementById('reviewer-name').value,
+            business_module_goal: document.getElementById('business-module-goal').value,
+            resource_coordination: document.getElementById('resource-coordination').value,
+            collaboration_model: document.getElementById('collaboration-model').value,
+            continue_willingness: document.getElementById('continue-willingness').value,
+            kpi_change: document.getElementById('kpi-change').value,
+            efficiency_change: document.getElementById('efficiency-change').value,
+            milestone_summary: document.getElementById('milestone-summary').value,
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || '提交失败');
+        showMessage(result.writable ? '提交成功，看板会自动同步' : '提交成功，但 Supabase 未配置，线上不会持久化', result.writable ? 'success' : 'error');
+      } catch (error) {
+        showMessage(error.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    loadPilots().catch(error => showMessage(error.message, 'error'));
+  </script>
+</body>
+</html>

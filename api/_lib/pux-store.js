@@ -21,6 +21,20 @@ function cleanText(value) {
   return String(value || '').replace(/<\|FunctionExecuteResult\|>/g, '');
 }
 
+function sanitizePoFeedback(feedback) {
+  return {
+    ...feedback,
+    reviewer_name: cleanText(feedback.reviewer_name),
+    business_module_goal: cleanText(feedback.business_module_goal),
+    resource_coordination: cleanText(feedback.resource_coordination),
+    collaboration_model: cleanText(feedback.collaboration_model),
+    continue_willingness: cleanText(feedback.continue_willingness),
+    kpi_change: cleanText(feedback.kpi_change),
+    efficiency_change: cleanText(feedback.efficiency_change),
+    milestone_summary: cleanText(feedback.milestone_summary),
+  };
+}
+
 function sanitizePilot(pilot) {
   return {
     ...pilot,
@@ -30,6 +44,7 @@ function sanitizePilot(pilot) {
     project: cleanText(pilot.project),
     execution_process: cleanText(pilot.execution_process),
     conclusion: cleanText(pilot.conclusion) || '顺利进行',
+    po_feedback: Array.isArray(pilot.po_feedback) ? pilot.po_feedback.map(sanitizePoFeedback) : [],
   };
 }
 

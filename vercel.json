@@ -14,6 +14,10 @@
       "destination": "/api/pux-admin.js"
     },
     {
+      "source": "/api/pux/po-feedback",
+      "destination": "/api/pux-po-feedback.js"
+    },
+    {
       "source": "/api/get_data",
       "destination": "/api/get_data.js"
     },
@@ -28,6 +32,10 @@
     {
       "source": "/pux",
       "destination": "/pux.html"
+    },
+    {
+      "source": "/po",
+      "destination": "/po.html"
     },
     {
       "source": "/pux-dashboard",
