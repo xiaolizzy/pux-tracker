@@ -35,6 +35,17 @@ function sanitizePoFeedback(feedback) {
   };
 }
 
+function sanitizeHighlight(highlight) {
+  return {
+    ...highlight,
+    title: cleanText(highlight.title),
+    subtitle: cleanText(highlight.subtitle),
+    body: cleanText(highlight.body),
+    owner: cleanText(highlight.owner),
+    date: cleanText(highlight.date),
+  };
+}
+
 function sanitizePilot(pilot) {
   return {
     ...pilot,
@@ -52,6 +63,7 @@ function sanitizeDashboardData(data) {
   return {
     ...data,
     pilots: Array.isArray(data.pilots) ? data.pilots.map(sanitizePilot) : [],
+    highlights: Array.isArray(data.highlights) ? data.highlights.map(sanitizeHighlight) : [],
   };
 }
 
@@ -84,6 +96,7 @@ function normalizeDataShape(data) {
         2: data.steps_definition?.step2?.description || '自己产生想法并推进',
         3: data.steps_definition?.step3?.description || '从想法到Demo甚至推广运营',
       },
+      highlights: Array.isArray(data.highlights) ? data.highlights : [],
     });
   }
 
@@ -94,6 +107,7 @@ function normalizeDataShape(data) {
       2: '自己产生想法并推进',
       3: '从想法到Demo甚至推广运营',
     },
+    highlights: [],
   };
 }
 

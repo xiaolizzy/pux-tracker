@@ -45,10 +45,26 @@ function normalizePoFeedback(input = {}, pilot = {}) {
   };
 }
 
+function normalizeHighlight(input = {}) {
+  return {
+    title: String(input.title || '').trim(),
+    subtitle: String(input.subtitle || '').trim(),
+    body: String(input.body || '').trim(),
+    owner: String(input.owner || '').trim(),
+    date: input.date || new Date().toISOString().slice(0, 10),
+  };
+}
+
 function validatePilot(pilot) {
   if (!pilot.name) return '姓名不能为空';
   if (!pilot.product_line) return '产品线不能为空';
   if (!pilot.po_name) return 'PO 不能为空';
+  return '';
+}
+
+function validateHighlight(highlight) {
+  if (!highlight.title) return '高光标题不能为空';
+  if (!highlight.body) return '高光正文不能为空';
   return '';
 }
 
@@ -104,6 +120,7 @@ module.exports = async (req, res) => {
     const result = await readData();
     const data = result.data;
     data.pilots = Array.isArray(data.pilots) ? data.pilots : [];
+    data.highlights = Array.isArray(data.highlights) ? data.highlights : [];
 
     if (action === 'create') {
       const pilot = normalizePilot(payload);
@@ -214,6 +231,29 @@ module.exports = async (req, res) => {
         return res.status(400).json({ success: false, message: 'PO 评价记录不存在' });
       }
       pilot.po_feedback.splice(poFeedbackIndex, 1);
+    } else if (action === 'save_highlight') {
+      const highlightIndex = payload.highlightIndex;
+      const highlight = normalizeHighlight(payload.highlight);
+      const validationError = validateHighlight(highlight);
+      if (validationError) {
+        return res.status(400).json({ success: false, message: validationError });
+      }
+
+      if (highlightIndex === undefined || highlightIndex === null || highlightIndex === '') {
+        data.highlights.push(highlight);
+      } else {
+        const index = Number(highlightIndex);
+        if (!Number.isInteger(index) || index < 0 || index >= data.highlights.length) {
+          return res.status(400).json({ success: false, message: '高光案例不存在' });
+        }
+        data.highlights[index] = highlight;
+      }
+    } else if (action === 'delete_highlight') {
+      const highlightIndex = Number(payload.highlightIndex);
+      if (!Number.isInteger(highlightIndex) || highlightIndex < 0 || highlightIndex >= data.highlights.length) {
+        return res.status(400).json({ success: false, message: '高光案例不存在' });
+      }
+      data.highlights.splice(highlightIndex, 1);
     } else {
       return res.status(400).json({ success: false, message: `Unsupported action: ${action}` });
     }

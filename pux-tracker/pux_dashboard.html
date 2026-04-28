@@ -66,6 +66,18 @@
 
         .card-footer { padding: 15px 20px; background: #fafafa; border-top: 1px solid var(--border-color); font-size: 12px; color: #999; display: flex; justify-content: space-between; }
         .sync-status { margin-top: 12px; font-size: 12px; color: #8c8c8c; }
+        .highlights-section { margin-top: 44px; }
+        .highlights-header { margin-bottom: 16px; }
+        .highlights-kicker { color: var(--primary-color); font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+        .highlights-title { margin-top: 6px; font-size: 24px; font-weight: 900; }
+        .highlights-subtitle { margin-top: 6px; color: var(--text-sub); font-size: 14px; }
+        .highlights-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .highlight-card { background: #fff; border-radius: 14px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .highlight-date { color: #999; font-size: 12px; margin-bottom: 10px; }
+        .highlight-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+        .highlight-subtitle { color: var(--primary-color); font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+        .highlight-body { color: #444; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+        .highlight-owner { margin-top: 12px; color: var(--text-sub); font-size: 12px; }
         
         @media (max-width: 980px) {
             .stage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -74,6 +86,7 @@
         @media (max-width: 600px) {
             .stage-header { align-items: flex-start; flex-direction: column; }
             .stage-grid { grid-template-columns: 1fr; }
+            .highlights-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -92,6 +105,8 @@
         <div class="stage-board" id="pilot-list">
             <!-- Cards will be loaded here -->
         </div>
+
+        <section class="highlights-section" id="highlights-section"></section>
     </div>
 
     <script>
@@ -284,6 +299,39 @@
             `;
         }
 
+        function getHighlightItems(data) {
+            return (Array.isArray(data.highlights) ? data.highlights : [])
+                .filter(item => item.title || item.body)
+                .sort((a, b) => getTimeValue(b.date) - getTimeValue(a.date));
+        }
+
+        function renderHighlights(data) {
+            const highlights = getHighlightItems(data);
+            if (!highlights.length) {
+                document.getElementById('highlights-section').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('highlights-section').innerHTML = `
+                <div class="highlights-header">
+                    <div class="highlights-kicker">Highlights</div>
+                    <div class="highlights-title">转型高光时刻</div>
+                    <div class="highlights-subtitle">沉淀 PUX 转型过程中值得复用的好案例</div>
+                </div>
+                <div class="highlights-grid">
+                    ${highlights.map(item => `
+                        <article class="highlight-card">
+                            <div class="highlight-date">${escapeHtml(item.date || '未记录日期')}</div>
+                            <div class="highlight-title">${escapeHtml(item.title)}</div>
+                            <div class="highlight-subtitle">${escapeHtml(item.subtitle || '转型案例')}</div>
+                            <div class="highlight-body">${escapeHtml(item.body)}</div>
+                            ${item.owner ? `<div class="highlight-owner">相关成员：${escapeHtml(item.owner)}</div>` : ''}
+                        </article>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         function renderDashboard(data) {
             // 1. Render Summary Stats
             const stats = {
@@ -337,6 +385,7 @@
                 `;
             }).join('');
             document.getElementById('pilot-list').innerHTML = listHtml;
+            renderHighlights(data);
         }
 
         async function loadDashboard({ force = false } = {}) {

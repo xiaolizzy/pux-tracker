@@ -110,6 +110,7 @@
     .mini-form-grid .full { grid-column: 1 / -1; }
     .mini-form-grid textarea { min-height: 74px; font-size: 13px; }
     .mini-form-grid input, .mini-form-grid select { font-size: 13px; }
+    .wide-panel { margin-top: 20px; }
 
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
@@ -226,6 +227,16 @@
         <div id="message" class="message"></div>
       </section>
     </div>
+
+    <section class="panel wide-panel">
+      <div class="panel-header">
+        <span class="panel-title">Highlights / 转型高光时刻</span>
+        <span class="hint" id="highlights-count">暂无高光案例</span>
+      </div>
+      <div class="history-panel" style="border-top: 0;">
+        <div id="highlights-list" class="history-list"></div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -410,6 +421,57 @@
       ].join('');
     }
 
+    function getSortedHighlights() {
+      return (Array.isArray(dashboardData.highlights) ? dashboardData.highlights : [])
+        .map((item, index) => ({ ...item, highlightIndex: index }))
+        .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+    }
+
+    function renderHighlightForm(item, key, isNew = false) {
+      return `
+        <div class="history-item">
+          <div class="history-meta">${isNew ? '新增转型高光' : `${escapeHtml(item.date || '未记录日期')} · ${escapeHtml(item.owner || '未关联成员')}`}</div>
+          <div class="mini-form-grid">
+            <div>
+              <label for="highlight-${key}-date">日期</label>
+              <input id="highlight-${key}-date" type="date" value="${escapeHtml(item.date || new Date().toISOString().slice(0, 10))}">
+            </div>
+            <div>
+              <label for="highlight-${key}-owner">相关成员 / 业务</label>
+              <input id="highlight-${key}-owner" value="${escapeHtml(item.owner || '')}" placeholder="例如：图伊 / 商业增长">
+            </div>
+            <div class="full">
+              <label for="highlight-${key}-title">大标题 *</label>
+              <input id="highlight-${key}-title" value="${escapeHtml(item.title || '')}" placeholder="例如：从方案设计到代码落地的完整闭环">
+            </div>
+            <div class="full">
+              <label for="highlight-${key}-subtitle">小标题</label>
+              <input id="highlight-${key}-subtitle" value="${escapeHtml(item.subtitle || '')}" placeholder="例如：PUX 主动推进带来的效率提升">
+            </div>
+            <div class="full">
+              <label for="highlight-${key}-body">正文 *</label>
+              <textarea id="highlight-${key}-body" placeholder="描述案例背景、做法、结果和可复用经验">${escapeHtml(item.body || '')}</textarea>
+            </div>
+          </div>
+          <div class="history-actions">
+            ${isNew ? '' : `<button class="btn-danger" type="button" onclick="deleteHighlightItem(${item.highlightIndex})">删除</button>`}
+            <button class="btn-primary" type="button" onclick="saveHighlightItem('${key}', ${isNew ? 'null' : item.highlightIndex})">${isNew ? '新增高光案例' : '保存这条高光'}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHighlightsAdmin() {
+      const count = document.getElementById('highlights-count');
+      const list = document.getElementById('highlights-list');
+      const items = getSortedHighlights();
+      count.textContent = items.length ? `${items.length} 条高光案例` : '暂无高光案例';
+      list.innerHTML = [
+        renderHighlightForm({ date: new Date().toISOString().slice(0, 10) }, 'new', true),
+        ...items.map((item) => renderHighlightForm(item, item.highlightIndex))
+      ].join('');
+    }
+
     function fillForm(pilot) {
       fields.forEach((field) => setFieldValue(field, pilot[field]));
       setFieldValue('current_step', pilot.current_step || 1);
@@ -457,7 +519,9 @@
       if (!response.ok) throw new Error('加载数据失败');
       dashboardData = await response.json();
       dashboardData.pilots = Array.isArray(dashboardData.pilots) ? dashboardData.pilots : [];
+      dashboardData.highlights = Array.isArray(dashboardData.highlights) ? dashboardData.highlights : [];
       document.getElementById('sync-hint').textContent = `已加载 ${dashboardData.pilots.length} 位成员`;
+      renderHighlightsAdmin();
 
       if (selectedId && dashboardData.pilots.some((item) => item.id === selectedId)) {
         selectMember(selectedId);
@@ -573,6 +637,44 @@
         dashboardData = result.data;
         showMessage('已删除 PO 评价，看板会自动同步');
         await loadData();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    function getHighlightPayload(key) {
+      return {
+        date: document.getElementById(`highlight-${key}-date`).value,
+        owner: document.getElementById(`highlight-${key}-owner`).value,
+        title: document.getElementById(`highlight-${key}-title`).value,
+        subtitle: document.getElementById(`highlight-${key}-subtitle`).value,
+        body: document.getElementById(`highlight-${key}-body`).value,
+      };
+    }
+
+    async function saveHighlightItem(key, highlightIndex) {
+      try {
+        const result = await callAdmin('save_highlight', {
+          highlightIndex,
+          highlight: getHighlightPayload(key),
+        });
+        dashboardData = result.data;
+        dashboardData.highlights = Array.isArray(dashboardData.highlights) ? dashboardData.highlights : [];
+        showMessage('已保存高光案例，看板会自动同步');
+        renderHighlightsAdmin();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function deleteHighlightItem(highlightIndex) {
+      if (!confirm('确认删除这条转型高光案例吗？')) return;
+      try {
+        const result = await callAdmin('delete_highlight', { highlightIndex });
+        dashboardData = result.data;
+        dashboardData.highlights = Array.isArray(dashboardData.highlights) ? dashboardData.highlights : [];
+        showMessage('已删除高光案例，看板会自动同步');
+        renderHighlightsAdmin();
       } catch (error) {
         showMessage(error.message, 'error');
       }
