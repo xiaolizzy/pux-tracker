@@ -1,5 +1,11 @@
 {
   "version": 2,
+  "crons": [
+    {
+      "path": "/api/wecom/pux-reminder",
+      "schedule": "0 2 * * 5"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/pux/data",
@@ -16,6 +22,10 @@
     {
       "source": "/api/pux/po-feedback",
       "destination": "/api/pux-po-feedback.js"
+    },
+    {
+      "source": "/api/wecom/pux-reminder",
+      "destination": "/api/wecom-pux-reminder.js"
     },
     {
       "source": "/api/get_data",
