@@ -14,6 +14,14 @@
       "destination": "/api/pux-admin.js"
     },
     {
+      "source": "/api/get_data",
+      "destination": "/api/get_data.js"
+    },
+    {
+      "source": "/api/save_pux_progress",
+      "destination": "/api/save_pux_progress.js"
+    },
+    {
       "source": "/",
       "destination": "/index.html"
     },
