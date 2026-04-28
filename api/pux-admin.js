@@ -40,6 +40,32 @@ function ensureUniqueId(pilots, pilot) {
   return `${pilot.id}_${Date.now()}`;
 }
 
+function applyLatestHistoryToPilot(pilot) {
+  const history = Array.isArray(pilot.history) ? pilot.history : [];
+  const latest = history
+    .map((item, index) => ({ ...item, index }))
+    .filter((item) => item.project || item.execution_process || item.conclusion || item.action)
+    .sort((a, b) => {
+      const timeDiff = new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime();
+      return timeDiff || b.index - a.index;
+    })[0];
+
+  if (!latest) {
+    pilot.project = '';
+    pilot.execution_process = '';
+    pilot.conclusion = '顺利进行';
+    pilot.last_update = new Date().toISOString().slice(0, 10);
+    return;
+  }
+
+  pilot.current_step = Number(latest.step || latest.current_step || pilot.current_step || 1);
+  pilot.status = latest.status || pilot.status || 'in_progress';
+  pilot.project = latest.project || '';
+  pilot.execution_process = latest.execution_process || latest.description || '';
+  pilot.conclusion = latest.conclusion || pilot.conclusion || '顺利进行';
+  pilot.last_update = latest.date || pilot.last_update || new Date().toISOString().slice(0, 10);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method Not Allowed' });
@@ -95,6 +121,7 @@ module.exports = async (req, res) => {
         current_step: nextPilot.current_step,
         status: nextPilot.status,
         project: nextPilot.project,
+        execution_process: nextPilot.execution_process,
         conclusion: nextPilot.conclusion,
       });
 
@@ -106,6 +133,21 @@ module.exports = async (req, res) => {
       if (data.pilots.length === beforeCount) {
         return res.status(404).json({ success: false, message: 'PUX 成员不存在' });
       }
+    } else if (action === 'delete_history') {
+      const id = payload.id;
+      const historyIndex = Number(payload.historyIndex);
+      const pilot = data.pilots.find((item) => item.id === id);
+      if (!pilot) {
+        return res.status(404).json({ success: false, message: 'PUX 成员不存在' });
+      }
+
+      pilot.history = Array.isArray(pilot.history) ? pilot.history : [];
+      if (!Number.isInteger(historyIndex) || historyIndex < 0 || historyIndex >= pilot.history.length) {
+        return res.status(400).json({ success: false, message: '历史记录不存在' });
+      }
+
+      pilot.history.splice(historyIndex, 1);
+      applyLatestHistoryToPilot(pilot);
     } else {
       return res.status(400).json({ success: false, message: `Unsupported action: ${action}` });
     }

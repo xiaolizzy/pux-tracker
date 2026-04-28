@@ -97,6 +97,15 @@
     .message.success { display: block; background: #f6ffed; color: #389e0d; }
     .message.error { display: block; background: #fff1f0; color: #cf1322; }
     .hint { color: var(--text-sub); font-size: 13px; line-height: 1.6; }
+    .history-panel { border-top: 1px solid var(--border-color); padding: 20px; }
+    .history-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .history-title { font-weight: 700; }
+    .history-list { display: grid; gap: 10px; }
+    .history-item { border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; background: #fafafa; }
+    .history-meta { color: var(--text-sub); font-size: 12px; margin-bottom: 6px; }
+    .history-project { font-weight: 700; margin-bottom: 6px; }
+    .history-desc { color: #444; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+    .history-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
 
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
@@ -195,6 +204,13 @@
             <button class="btn-primary" id="save-btn" type="submit">保存</button>
           </div>
         </form>
+        <div class="history-panel" id="history-panel">
+          <div class="history-header">
+            <span class="history-title">历史记录管理</span>
+            <span class="hint" id="history-count">暂无历史记录</span>
+          </div>
+          <div id="history-list" class="history-list"></div>
+        </div>
         <div id="message" class="message"></div>
       </section>
     </div>
@@ -222,6 +238,15 @@
 
     function setFieldValue(id, value) {
       document.getElementById(id).value = value || '';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function getFormPayload() {
@@ -254,12 +279,50 @@
       `).join('');
     }
 
+    function getSortedHistory(pilot) {
+      return (Array.isArray(pilot.history) ? pilot.history : [])
+        .map((item, index) => ({ ...item, historyIndex: index }))
+        .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+    }
+
+    function renderHistory(pilot) {
+      const panel = document.getElementById('history-panel');
+      const count = document.getElementById('history-count');
+      const list = document.getElementById('history-list');
+
+      if (!pilot || !pilot.id || mode === 'create') {
+        panel.style.display = 'none';
+        return;
+      }
+
+      const history = getSortedHistory(pilot);
+      panel.style.display = 'block';
+      count.textContent = history.length ? `${history.length} 条历史` : '暂无历史记录';
+      if (!history.length) {
+        list.innerHTML = '<div class="hint">暂无历史记录。提交页或后台保存后会在这里生成记录。</div>';
+        return;
+      }
+
+      list.innerHTML = history.map((item) => `
+        <div class="history-item">
+          <div class="history-meta">${escapeHtml(item.date || '未记录日期')} · Step ${escapeHtml(item.step || item.current_step || pilot.current_step || 1)} · ${escapeHtml(item.status || pilot.status || 'in_progress')}</div>
+          <div class="history-project">${escapeHtml(item.project || item.action || '阶段进展')}</div>
+          <div class="history-desc">${escapeHtml(item.execution_process || item.description || '暂无过程描述')}</div>
+          <div class="history-desc">结论：${escapeHtml(item.conclusion || '暂无')}</div>
+          <div class="history-actions">
+            <button class="btn-danger" type="button" onclick="deleteHistoryItem(${item.historyIndex})">删除这条记录</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
     function fillForm(pilot) {
       fields.forEach((field) => setFieldValue(field, pilot[field]));
       setFieldValue('current_step', pilot.current_step || 1);
       setFieldValue('status', pilot.status || 'in_progress');
       setFieldValue('conclusion', pilot.conclusion || '顺利进行');
       document.getElementById('delete-btn').style.display = pilot.id ? 'inline-block' : 'none';
+      renderHistory(pilot);
     }
 
     function selectMember(id) {
@@ -281,6 +344,7 @@
         status: 'in_progress',
         conclusion: '顺利进行',
       });
+      renderHistory(null);
       renderList();
     }
 
@@ -353,6 +417,22 @@
         dashboardData = result.data;
         selectedId = '';
         showMessage('已删除成员，看板会自动同步');
+        await loadData();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function deleteHistoryItem(historyIndex) {
+      if (!selectedId) return;
+      const pilot = dashboardData.pilots.find((item) => item.id === selectedId);
+      if (!pilot) return;
+      if (!confirm(`确认删除 ${pilot.name} 的这条历史记录吗？如果它是当前最新进展，看板会回退到上一条记录。`)) return;
+
+      try {
+        const result = await callAdmin('delete_history', { id: selectedId, historyIndex });
+        dashboardData = result.data;
+        showMessage('已删除历史记录，看板会自动同步');
         await loadData();
       } catch (error) {
         showMessage(error.message, 'error');
