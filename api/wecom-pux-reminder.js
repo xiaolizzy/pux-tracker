@@ -1,5 +1,8 @@
 const { sendTextToWeCom } = require('./_lib/wecom');
 
+const DEFAULT_PUX_FALLBACK_FORM_URL =
+  'https://doc.weixin.qq.com/forms/AJUA2wdHAAcAPgAIgbwALICNuMWAFvLhf?page=1';
+
 function getPublicBaseUrl(req) {
   if (process.env.PUBLIC_BASE_URL) return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
   const protocol = req.headers['x-forwarded-proto'] || 'https';
@@ -21,6 +24,7 @@ module.exports = async (req, res) => {
 
   const baseUrl = getPublicBaseUrl(req);
   const formUrl = `${baseUrl}/pux`;
+  const fallbackFormUrl = process.env.WECOM_PUX_FALLBACK_FORM_URL || DEFAULT_PUX_FALLBACK_FORM_URL;
   const dashboardUrl = `${baseUrl}/pux-dashboard`;
   const message =
     `📮【PUX 本周进展收集】\n` +
@@ -30,6 +34,7 @@ module.exports = async (req, res) => {
     `3. 执行过程、产出、卡点和下一步\n` +
     `4. 当前结论：顺利进行 / 待观察 / 遇到阻碍\n\n` +
     `填写入口：${formUrl}\n` +
+    `备用入口（企业微信问卷）：${fallbackFormUrl}\n` +
     `看板入口：${dashboardUrl}`;
 
   try {
