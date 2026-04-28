@@ -106,11 +106,16 @@
     .history-project { font-weight: 700; margin-bottom: 6px; }
     .history-desc { color: #444; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
     .history-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .mini-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .mini-form-grid .full { grid-column: 1 / -1; }
+    .mini-form-grid textarea { min-height: 74px; font-size: 13px; }
+    .mini-form-grid input, .mini-form-grid select { font-size: 13px; }
 
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
       header { flex-direction: column; }
       .form-grid { grid-template-columns: 1fr; }
+      .mini-form-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -210,6 +215,13 @@
             <span class="hint" id="history-count">暂无历史记录</span>
           </div>
           <div id="history-list" class="history-list"></div>
+        </div>
+        <div class="history-panel" id="po-feedback-panel">
+          <div class="history-header">
+            <span class="history-title">PO 评价历史管理</span>
+            <span class="hint" id="po-feedback-count">暂无 PO 评价</span>
+          </div>
+          <div id="po-feedback-list" class="history-list"></div>
         </div>
         <div id="message" class="message"></div>
       </section>
@@ -316,6 +328,88 @@
       `).join('');
     }
 
+    function getSortedPoFeedback(pilot) {
+      return (Array.isArray(pilot.po_feedback) ? pilot.po_feedback : [])
+        .map((item, index) => ({ ...item, poFeedbackIndex: index }))
+        .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+    }
+
+    function renderContinueOptions(value) {
+      const options = ['', '愿意继续', '需要调整后继续', '暂不建议继续'];
+      return options.map((option) => `
+        <option value="${escapeHtml(option)}" ${option === value ? 'selected' : ''}>${escapeHtml(option || '请选择...')}</option>
+      `).join('');
+    }
+
+    function renderPoFeedbackForm(item, key, isNew = false) {
+      return `
+        <div class="history-item">
+          <div class="history-meta">${isNew ? '新增 PO 评价' : `${escapeHtml(item.date || '未记录日期')} · ${escapeHtml(item.reviewer_name || item.po_name || 'PO')}`}</div>
+          <div class="mini-form-grid">
+            <div>
+              <label for="po-${key}-date">日期</label>
+              <input id="po-${key}-date" type="date" value="${escapeHtml(item.date || new Date().toISOString().slice(0, 10))}">
+            </div>
+            <div>
+              <label for="po-${key}-reviewer">评价人</label>
+              <input id="po-${key}-reviewer" value="${escapeHtml(item.reviewer_name || '')}" placeholder="例如：锐仔">
+            </div>
+            <div class="full">
+              <label for="po-${key}-goal">业务模块和目标 *</label>
+              <textarea id="po-${key}-goal">${escapeHtml(item.business_module_goal || '')}</textarea>
+            </div>
+            <div class="full">
+              <label for="po-${key}-resource">双方磨合 / 协调资源</label>
+              <textarea id="po-${key}-resource">${escapeHtml(item.resource_coordination || '')}</textarea>
+            </div>
+            <div class="full">
+              <label for="po-${key}-model">稳定协作模式 *</label>
+              <textarea id="po-${key}-model">${escapeHtml(item.collaboration_model || '')}</textarea>
+            </div>
+            <div>
+              <label for="po-${key}-willingness">继续合作意愿 *</label>
+              <select id="po-${key}-willingness">${renderContinueOptions(item.continue_willingness || '')}</select>
+            </div>
+            <div>
+              <label for="po-${key}-kpi">KPI 变化</label>
+              <textarea id="po-${key}-kpi">${escapeHtml(item.kpi_change || '')}</textarea>
+            </div>
+            <div class="full">
+              <label for="po-${key}-efficiency">协作效率</label>
+              <textarea id="po-${key}-efficiency">${escapeHtml(item.efficiency_change || '')}</textarea>
+            </div>
+            <div class="full">
+              <label for="po-${key}-milestone">里程碑评估</label>
+              <textarea id="po-${key}-milestone">${escapeHtml(item.milestone_summary || '')}</textarea>
+            </div>
+          </div>
+          <div class="history-actions">
+            ${isNew ? '' : `<button class="btn-danger" type="button" onclick="deletePoFeedbackItem(${item.poFeedbackIndex})">删除</button>`}
+            <button class="btn-primary" type="button" onclick="savePoFeedbackItem('${key}', ${isNew ? 'null' : item.poFeedbackIndex})">${isNew ? '新增 PO 评价' : '保存这条评价'}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPoFeedbackAdmin(pilot) {
+      const panel = document.getElementById('po-feedback-panel');
+      const count = document.getElementById('po-feedback-count');
+      const list = document.getElementById('po-feedback-list');
+
+      if (!pilot || !pilot.id || mode === 'create') {
+        panel.style.display = 'none';
+        return;
+      }
+
+      const items = getSortedPoFeedback(pilot);
+      panel.style.display = 'block';
+      count.textContent = items.length ? `${items.length} 条 PO 评价` : '暂无 PO 评价';
+      list.innerHTML = [
+        renderPoFeedbackForm({ reviewer_name: pilot.po_name || '', date: new Date().toISOString().slice(0, 10) }, 'new', true),
+        ...items.map((item) => renderPoFeedbackForm(item, item.poFeedbackIndex))
+      ].join('');
+    }
+
     function fillForm(pilot) {
       fields.forEach((field) => setFieldValue(field, pilot[field]));
       setFieldValue('current_step', pilot.current_step || 1);
@@ -323,6 +417,7 @@
       setFieldValue('conclusion', pilot.conclusion || '顺利进行');
       document.getElementById('delete-btn').style.display = pilot.id ? 'inline-block' : 'none';
       renderHistory(pilot);
+      renderPoFeedbackAdmin(pilot);
     }
 
     function selectMember(id) {
@@ -345,6 +440,7 @@
         conclusion: '顺利进行',
       });
       renderHistory(null);
+      renderPoFeedbackAdmin(null);
       renderList();
     }
 
@@ -433,6 +529,49 @@
         const result = await callAdmin('delete_history', { id: selectedId, historyIndex });
         dashboardData = result.data;
         showMessage('已删除历史记录，看板会自动同步');
+        await loadData();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    function getPoFeedbackPayload(key) {
+      return {
+        date: document.getElementById(`po-${key}-date`).value,
+        reviewer_name: document.getElementById(`po-${key}-reviewer`).value,
+        business_module_goal: document.getElementById(`po-${key}-goal`).value,
+        resource_coordination: document.getElementById(`po-${key}-resource`).value,
+        collaboration_model: document.getElementById(`po-${key}-model`).value,
+        continue_willingness: document.getElementById(`po-${key}-willingness`).value,
+        kpi_change: document.getElementById(`po-${key}-kpi`).value,
+        efficiency_change: document.getElementById(`po-${key}-efficiency`).value,
+        milestone_summary: document.getElementById(`po-${key}-milestone`).value,
+      };
+    }
+
+    async function savePoFeedbackItem(key, poFeedbackIndex) {
+      if (!selectedId) return;
+      try {
+        const result = await callAdmin('save_po_feedback', {
+          id: selectedId,
+          poFeedbackIndex,
+          feedback: getPoFeedbackPayload(key),
+        });
+        dashboardData = result.data;
+        showMessage('已保存 PO 评价，看板会自动同步');
+        await loadData();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function deletePoFeedbackItem(poFeedbackIndex) {
+      if (!selectedId) return;
+      if (!confirm('确认删除这条 PO 评价吗？')) return;
+      try {
+        const result = await callAdmin('delete_po_feedback', { id: selectedId, poFeedbackIndex });
+        dashboardData = result.data;
+        showMessage('已删除 PO 评价，看板会自动同步');
         await loadData();
       } catch (error) {
         showMessage(error.message, 'error');
