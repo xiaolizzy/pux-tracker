@@ -4,6 +4,10 @@
     {
       "path": "/api/wecom/pux-reminder",
       "schedule": "0 2 * * 5"
+    },
+    {
+      "path": "/api/wecom/po-reminder",
+      "schedule": "0 2 * * 5"
     }
   ],
   "rewrites": [
@@ -26,6 +30,10 @@
     {
       "source": "/api/wecom/pux-reminder",
       "destination": "/api/wecom-pux-reminder.js"
+    },
+    {
+      "source": "/api/wecom/po-reminder",
+      "destination": "/api/wecom-po-reminder.js"
     },
     {
       "source": "/api/get_data",
