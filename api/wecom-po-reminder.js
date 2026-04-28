@@ -1,5 +1,8 @@
 const { sendTextToWeCom } = require('./_lib/wecom');
 
+const DEFAULT_PO_FALLBACK_FORM_URL =
+  'https://doc.weixin.qq.com/forms/AJUA2wdHAAcAPgAIgbwALICNLH2OVTiGf?page=1';
+
 function getPublicBaseUrl(req) {
   if (process.env.PUBLIC_BASE_URL) return process.env.PUBLIC_BASE_URL.replace(/\/$/, '');
   const protocol = req.headers['x-forwarded-proto'] || 'https';
@@ -21,6 +24,7 @@ module.exports = async (req, res) => {
 
   const baseUrl = getPublicBaseUrl(req);
   const formUrl = `${baseUrl}/po`;
+  const fallbackFormUrl = process.env.WECOM_PO_FALLBACK_FORM_URL || DEFAULT_PO_FALLBACK_FORM_URL;
   const dashboardUrl = `${baseUrl}/pux-dashboard`;
   const message =
     `📮【PO 视角协作反馈收集】\n` +
@@ -31,6 +35,7 @@ module.exports = async (req, res) => {
     `4. 是否愿意继续这种合作方式\n` +
     `5. 核心 KPI 和方案产出效率是否有正向变化\n\n` +
     `填写入口：${formUrl}\n` +
+    `备用入口（企业微信问卷）：${fallbackFormUrl}\n` +
     `看板入口：${dashboardUrl}`;
 
   try {
