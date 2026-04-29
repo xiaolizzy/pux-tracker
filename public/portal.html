@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUX 管理员入口</title>
+  <style>
+    :root {
+      --primary: #07c160;
+      --blue: #1677ff;
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --text: #1f1f1f;
+      --sub: #666666;
+      --border: #eeeeee;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 18px;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #f6ffed 100%);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      margin-bottom: 22px;
+    }
+    h1 { margin: 0 0 10px; font-size: 32px; }
+    .subtitle { margin: 0; color: var(--sub); line-height: 1.7; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .card {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f6ffed;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .tag.blue { background: #e6f4ff; color: var(--blue); }
+    .title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+    .desc { color: var(--sub); line-height: 1.7; font-size: 14px; margin-bottom: 16px; }
+    .url { color: #999; font-size: 13px; word-break: break-all; }
+    .footer { margin-top: 22px; color: #999; font-size: 13px; text-align: center; }
+    @media (max-width: 720px) {
+      body { padding: 18px 12px; }
+      .hero { padding: 24px 20px; border-radius: 16px; }
+      h1 { font-size: 28px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>PUX 管理员入口</h1>
+      <p class="subtitle">把常用页面集中在这里。你只需要收藏这个入口，就可以快速打开看板、信息收集页和管理后台。</p>
+    </section>
+
+    <section class="grid">
+      <a class="card" href="/pux-dashboard">
+        <span class="tag">查看</span>
+        <div class="title">转型看板</div>
+        <div class="desc">查看 PUX 当前阶段、成员进展、PO 反馈历史和转型高光时刻。</div>
+        <div class="url">/pux-dashboard</div>
+      </a>
+
+      <a class="card" href="/pux">
+        <span class="tag blue">填报</span>
+        <div class="title">PUX 信息收集</div>
+        <div class="desc">给 PUX 成员填写本周进展、阶段状态、行动过程和结论。</div>
+        <div class="url">/pux</div>
+      </a>
+
+      <a class="card" href="/po">
+        <span class="tag blue">填报</span>
+        <div class="title">PO 反馈收集</div>
+        <div class="desc">给 PO 填写对 PUX 试点协作的评价、合作意愿和优秀案例线索。</div>
+        <div class="url">/po</div>
+      </a>
+
+      <a class="card" href="/admin">
+        <span class="tag">管理</span>
+        <div class="title">管理后台</div>
+        <div class="desc">维护 PUX 名单、产品线、历史记录、PO 评价和 Highlights 高光案例。</div>
+        <div class="url">/admin</div>
+      </a>
+    </section>
+
+    <div class="footer">建议收藏本页，后续新增入口也可以继续放在这里。</div>
+  </main>
+</body>
+</html>

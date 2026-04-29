@@ -48,6 +48,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/portal",
+      "destination": "/portal.html"
+    },
+    {
       "source": "/pux",
       "destination": "/pux.html"
     },
