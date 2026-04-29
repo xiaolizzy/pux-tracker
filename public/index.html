@@ -224,9 +224,9 @@
                     <div class="po-grid">
                         <div class="po-row"><span class="po-label">业务模块和目标：</span>${escapeHtml(latest.business_module_goal || '暂无')}</div>
                         <div class="po-row"><span class="po-label">协作模式：</span>${escapeHtml(latest.collaboration_model || '暂无')}</div>
-                        <div class="po-row"><span class="po-label">KPI 变化：</span>${escapeHtml(latest.kpi_change || '暂无')}</div>
-                        <div class="po-row"><span class="po-label">效率变化：</span>${escapeHtml(latest.efficiency_change || '暂无')}</div>
-                        <div class="po-row"><span class="po-label">里程碑评估：</span>${escapeHtml(latest.milestone_summary || '暂无')}</div>
+                        <div class="po-row"><span class="po-label">业务指标 OKR：</span>${escapeHtml(latest.kpi_change || '暂无')}</div>
+                        <div class="po-row"><span class="po-label">方案产出效率：</span>${escapeHtml(latest.efficiency_change || '暂无')}</div>
+                        <div class="po-row"><span class="po-label">其他补充：</span>${escapeHtml(latest.milestone_summary || '暂无')}</div>
                     </div>
                     <details class="history-toggle">
                         <summary>PO 评价历史（${items.length}）</summary>
@@ -238,9 +238,9 @@
                                     <div>目标：${escapeHtml(item.business_module_goal || '暂无')}</div>
                                     <div>协作：${escapeHtml(item.collaboration_model || '暂无')}</div>
                                     <div>资源：${escapeHtml(item.resource_coordination || '暂无')}</div>
-                                    <div>指标：${escapeHtml(item.kpi_change || '暂无')}</div>
-                                    <div>效率：${escapeHtml(item.efficiency_change || '暂无')}</div>
-                                    <div>里程碑：${escapeHtml(item.milestone_summary || '暂无')}</div>
+                                    <div>业务指标 OKR：${escapeHtml(item.kpi_change || '暂无')}</div>
+                                    <div>方案产出效率：${escapeHtml(item.efficiency_change || '暂无')}</div>
+                                    <div>其他补充：${escapeHtml(item.milestone_summary || '暂无')}</div>
                                 </div>
                             `).join('')}
                         </div>

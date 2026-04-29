@@ -25,8 +25,8 @@ function normalizePayload(body = {}) {
 function validatePayload(payload) {
   if (!payload.id) return 'Missing id';
   if (!payload.business_module_goal) return '请填写业务模块和目标';
-  if (!payload.collaboration_model) return '请填写协作模式反馈';
-  if (!payload.continue_willingness) return '请选择是否愿意继续合作';
+  if (!payload.collaboration_model) return '请填写协作关系反馈';
+  if (!payload.continue_willingness) return '请选择是否愿意继续这种合作方式';
   return '';
 }
 
@@ -69,8 +69,8 @@ module.exports = async (req, res) => {
       `PO：${pilot.po_name}\n\n` +
       `业务模块和目标：${payload.business_module_goal}\n` +
       `协作模式：${payload.collaboration_model}\n` +
-      `继续合作意愿：${payload.continue_willingness}\n` +
-      `里程碑评估：${payload.milestone_summary || '暂无'}\n\n` +
+      `是否愿意继续这种合作方式：${payload.continue_willingness}\n` +
+      `其他补充：${payload.milestone_summary || '暂无'}\n\n` +
       `看板：${dashboardUrl}`;
 
     let wecomResult = null;

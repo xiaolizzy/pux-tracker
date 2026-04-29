@@ -5,63 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PO 反馈收集</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 24px; color: #1f1f1f; }
-    .container { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    h1 { margin: 0 0 8px; font-size: 26px; text-align: center; }
-    .subtitle { margin: 0 0 24px; text-align: center; color: #595959; line-height: 1.6; }
-    .form-group { margin-bottom: 18px; }
-    label { display: block; margin-bottom: 8px; font-weight: 700; color: #555; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; color: #1f1f1f; }
+    .container { max-width: 920px; margin: 0 auto; background: #fff; min-height: 100vh; }
+    .header { padding: 32px 28px 28px; border-bottom: 10px solid #f0f2f5; }
+    h1 { margin: 0 0 18px; font-size: 28px; }
+    .subtitle { margin: 0; color: #333; line-height: 1.6; font-size: 16px; }
+    form { background: #f0f2f5; }
+    .form-group { margin: 0 0 10px; padding: 24px 28px; background: #fff; }
+    label { display: block; margin-bottom: 8px; font-weight: 800; color: #111; font-size: 20px; }
+    .required-mark { color: #ff4d4f; margin-right: 6px; }
+    .question-desc { margin: 0 0 14px; color: #555; line-height: 1.7; font-size: 15px; }
     input, select, textarea { width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; padding: 12px; font-size: 15px; font-family: inherit; outline-color: #07c160; }
-    textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
-    button { width: 100%; border: 0; border-radius: 8px; background: #07c160; color: #fff; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    textarea { min-height: 92px; resize: vertical; line-height: 1.6; }
+    .submit-wrap { padding: 24px 28px 32px; background: #f0f2f5; }
+    button { width: min(460px, 100%); display: block; margin: 0 auto; border: 0; border-radius: 8px; background: #1677ff; color: #fff; padding: 14px; font-size: 20px; font-weight: 800; cursor: pointer; }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
     .pilot-info { display: none; margin-bottom: 18px; background: #f9f9f9; border-radius: 8px; padding: 12px; color: #595959; font-size: 14px; line-height: 1.6; }
     .message { display: none; margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; }
     .message.success { display: block; background: #f6ffed; color: #389e0d; }
     .message.error { display: block; background: #fff1f0; color: #cf1322; }
-    .nav { display: flex; justify-content: center; gap: 18px; margin-top: 18px; }
+    .nav { display: flex; justify-content: center; gap: 18px; padding: 0 28px 28px; background: #f0f2f5; }
     .nav a { color: #07c160; font-weight: 700; text-decoration: none; }
   </style>
 </head>
 <body>
   <main class="container">
-    <h1>PO 反馈收集</h1>
-    <p class="subtitle">用于收集 PO 对 PUX 试点协作的评价。提交后会同步到看板的对应 PUX 卡片中。</p>
+    <div class="header">
+      <h1>PO反馈收集</h1>
+      <p class="subtitle">用于收集PO对PUX试点协作的评价。</p>
+    </div>
 
     <form onsubmit="submitPoFeedback(event)">
       <div class="form-group">
-        <label for="pilot-select">对应 PUX 成员</label>
+        <label for="pilot-select"><span class="required-mark">*</span>01&nbsp;&nbsp;对应PUX成员</label>
         <select id="pilot-select" required onchange="selectPilot()">
-          <option value="">请选择姓名...</option>
+          <option value="">请选择</option>
         </select>
       </div>
 
       <div class="pilot-info" id="pilot-info"></div>
 
+      <input id="reviewer-name" type="hidden">
+
       <div class="form-group">
-        <label for="reviewer-name">评价人（可选）</label>
-        <input id="reviewer-name" placeholder="例如：锐仔">
+        <label for="business-module-goal"><span class="required-mark">*</span>02&nbsp;&nbsp;明确PUX对应的业务模块和目标</label>
+        <p class="question-desc">例如：负责某业务模块的体验升级，目标是提升转化效率/满意度等</p>
+        <input id="business-module-goal" required placeholder="请输入">
+      </div>
+
+      <input id="resource-coordination" type="hidden">
+
+      <div class="form-group">
+        <label for="collaboration-model"><span class="required-mark">*</span>03&nbsp;&nbsp;PUX与PO是否形成稳定的协作关系</label>
+        <p class="question-desc">描述协作中是否顺畅，资源协调是否充分，任务分工/决策链路是否稳定</p>
+        <input id="collaboration-model" required placeholder="请输入">
       </div>
 
       <div class="form-group">
-        <label for="business-module-goal">明确 PUX 对应的业务模块和目标 *</label>
-        <textarea id="business-module-goal" required placeholder="例如：负责某业务模块的体验升级，目标是提升转化/效率/满意度等"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="resource-coordination">双方磨合 / 协调资源</label>
-        <textarea id="resource-coordination" placeholder="描述协作中是否顺畅、资源协调是否充分、卡点在哪里"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="collaboration-model">PUX 与 PO 能否形成稳定的协作模式 *</label>
-        <textarea id="collaboration-model" required placeholder="描述目前协作节奏、任务分工、决策链路是否稳定"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="continue-willingness">双方是否愿意继续这种合作方式 *</label>
+        <label for="continue-willingness"><span class="required-mark">*</span>04&nbsp;&nbsp;是否愿意继续这种合作方式</label>
         <select id="continue-willingness" required>
-          <option value="">请选择...</option>
+          <option value="">请选择</option>
           <option value="愿意继续">愿意继续</option>
           <option value="需要调整后继续">需要调整后继续</option>
           <option value="暂不建议继续">暂不建议继续</option>
@@ -69,22 +72,26 @@
       </div>
 
       <div class="form-group">
-        <label for="kpi-change">业务指标：负责模块的核心 KPI 是否有正向变化</label>
-        <textarea id="kpi-change" placeholder="例如：有明显正向变化 / 暂未观察到 / 指标口径待明确，并补充原因"></textarea>
+        <label for="kpi-change">05&nbsp;&nbsp;（选填）业务指标中负责模块的核心OKR是否有正向变化</label>
+        <p class="question-desc">例如：有明显正向变化/暂未观察到/指标口径待明确，并补充案例<br>选填部分是为了挖掘优秀转型案例便于激励落地。</p>
+        <input id="kpi-change" placeholder="请输入">
       </div>
 
       <div class="form-group">
-        <label for="efficiency-change">协作效率：方案产出效率是否显著高于老模式</label>
-        <textarea id="efficiency-change" placeholder="例如：需求理解更快、方案反复减少、落地节奏更顺等"></textarea>
+        <label for="efficiency-change">06&nbsp;&nbsp;（选填）方案产出效率是否显著高于老模式</label>
+        <p class="question-desc">例如：需求理解更快/方案反复沟通修改减少/落地节奏更顺等，并补充案例<br>选填部分是为了挖掘优秀转型案例便于激励落地。</p>
+        <input id="efficiency-change" placeholder="请输入">
       </div>
 
       <div class="form-group">
-        <label for="milestone-summary">里程碑评估 / 补充说明</label>
-        <textarea id="milestone-summary" placeholder="总结当前阶段是否达成预期，以及建议下一步怎么调整"></textarea>
+        <label for="milestone-summary">07&nbsp;&nbsp;其他补充</label>
+        <input id="milestone-summary" placeholder="请输入">
       </div>
 
-      <button id="submit-btn" type="submit">提交 PO 反馈</button>
-      <div id="message" class="message"></div>
+      <div class="submit-wrap">
+        <button id="submit-btn" type="submit">提交</button>
+        <div id="message" class="message"></div>
+      </div>
     </form>
 
     <div class="nav">
@@ -108,7 +115,7 @@
       const data = await response.json();
       pilots = Array.isArray(data.pilots) ? data.pilots : [];
       const select = document.getElementById('pilot-select');
-      select.innerHTML = '<option value="">请选择姓名...</option>' + pilots.map(pilot => (
+      select.innerHTML = '<option value="">请选择</option>' + pilots.map(pilot => (
         `<option value="${pilot.id}">${pilot.name} · PO：${pilot.po_name || '-'}</option>`
       )).join('');
     }

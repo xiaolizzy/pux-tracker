@@ -366,31 +366,31 @@
               <input id="po-${key}-reviewer" value="${escapeHtml(item.reviewer_name || '')}" placeholder="例如：锐仔">
             </div>
             <div class="full">
-              <label for="po-${key}-goal">业务模块和目标 *</label>
+              <label for="po-${key}-goal">明确 PUX 对应的业务模块和目标 *</label>
               <textarea id="po-${key}-goal">${escapeHtml(item.business_module_goal || '')}</textarea>
             </div>
             <div class="full">
-              <label for="po-${key}-resource">双方磨合 / 协调资源</label>
+              <label for="po-${key}-resource">资源协调补充</label>
               <textarea id="po-${key}-resource">${escapeHtml(item.resource_coordination || '')}</textarea>
             </div>
             <div class="full">
-              <label for="po-${key}-model">稳定协作模式 *</label>
+              <label for="po-${key}-model">PUX 与 PO 是否形成稳定的协作关系 *</label>
               <textarea id="po-${key}-model">${escapeHtml(item.collaboration_model || '')}</textarea>
             </div>
             <div>
-              <label for="po-${key}-willingness">继续合作意愿 *</label>
+              <label for="po-${key}-willingness">是否愿意继续这种合作方式 *</label>
               <select id="po-${key}-willingness">${renderContinueOptions(item.continue_willingness || '')}</select>
             </div>
             <div>
-              <label for="po-${key}-kpi">KPI 变化</label>
+              <label for="po-${key}-kpi">核心 OKR 是否有正向变化</label>
               <textarea id="po-${key}-kpi">${escapeHtml(item.kpi_change || '')}</textarea>
             </div>
             <div class="full">
-              <label for="po-${key}-efficiency">协作效率</label>
+              <label for="po-${key}-efficiency">方案产出效率是否显著高于老模式</label>
               <textarea id="po-${key}-efficiency">${escapeHtml(item.efficiency_change || '')}</textarea>
             </div>
             <div class="full">
-              <label for="po-${key}-milestone">里程碑评估</label>
+              <label for="po-${key}-milestone">其他补充</label>
               <textarea id="po-${key}-milestone">${escapeHtml(item.milestone_summary || '')}</textarea>
             </div>
           </div>

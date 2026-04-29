@@ -70,8 +70,8 @@ function validateHighlight(highlight) {
 
 function validatePoFeedback(feedback) {
   if (!feedback.business_module_goal) return '业务模块和目标不能为空';
-  if (!feedback.collaboration_model) return '协作模式反馈不能为空';
-  if (!feedback.continue_willingness) return '继续合作意愿不能为空';
+  if (!feedback.collaboration_model) return '协作关系反馈不能为空';
+  if (!feedback.continue_willingness) return '请选择是否愿意继续这种合作方式';
   return '';
 }
 
