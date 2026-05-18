@@ -46,12 +46,20 @@ function sanitizeHighlight(highlight) {
   };
 }
 
+function getEmploymentStatus(pilot) {
+  if (pilot.employment_status === 'departed') return 'departed';
+  // 柠木已离职，默认作为历史保留成员展示，避免旧数据未迁移时仍被计入在职统计。
+  if (cleanText(pilot.name) === '柠木') return 'departed';
+  return 'active';
+}
+
 function sanitizePilot(pilot) {
   return {
     ...pilot,
     name: cleanText(pilot.name),
     product_line: cleanText(pilot.product_line),
     po_name: cleanText(pilot.po_name),
+    employment_status: getEmploymentStatus(pilot),
     project: cleanText(pilot.project),
     execution_process: cleanText(pilot.execution_process),
     conclusion: cleanText(pilot.conclusion) || '顺利进行',
@@ -79,6 +87,7 @@ function normalizeDataShape(data) {
         po_name: member.po_name || '',
         current_step: Number(member.current_step || 1),
         status: member.status || 'in_progress',
+        employment_status: getEmploymentStatus(member),
         project:
           member.project ||
           member.steps?.[`step${member.current_step || 1}`]?.project ||

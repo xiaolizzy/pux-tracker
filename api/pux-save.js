@@ -45,6 +45,10 @@ module.exports = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Pilot not found' });
     }
 
+    if (pilot.employment_status === 'departed') {
+      return res.status(400).json({ success: false, message: '该成员已离职，仅保留历史记录，不能继续提交进展' });
+    }
+
     const oldStep = Number(pilot.current_step || 1);
     const oldStatus = pilot.status;
     const today = new Date().toISOString().slice(0, 10);

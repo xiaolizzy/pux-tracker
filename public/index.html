@@ -35,15 +35,20 @@
         .stage-count { background: #fff; color: var(--text-sub); padding: 8px 14px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); white-space: nowrap; }
         .stage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
         .pilot-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .pilot-card.alumni { filter: grayscale(0.8); opacity: 0.68; border: 1px dashed #d9d9d9; }
+        .pilot-card.alumni[open], .pilot-card.alumni:hover { opacity: 0.9; }
         .pilot-card[open], .pilot-card:hover { transform: translateY(-3px); }
         .card-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; list-style: none; }
         .card-header::-webkit-details-marker { display: none; }
         .pilot-name { font-size: 18px; font-weight: bold; }
         .pilot-sub { color: var(--text-sub); font-size: 13px; margin-top: 6px; }
+        .card-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
         .badge { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         .badge-step { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+        .badge-alumni { background: #f5f5f5; color: #8c8c8c; border: 1px solid #d9d9d9; }
         .badge-status { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
         .badge-status.warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+        .alumni-note { margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: #fafafa; color: #8c8c8c; font-size: 13px; line-height: 1.6; border: 1px dashed #d9d9d9; }
 
         .card-body { padding: 20px; }
         .info-row { display: flex; margin-bottom: 12px; font-size: 14px; }
@@ -77,6 +82,22 @@
         .highlight-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
         .highlight-subtitle { color: var(--primary-color); font-size: 13px; font-weight: 700; margin-bottom: 10px; }
         .highlight-body { color: #444; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+        .highlight-preview {
+            color: #444;
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .highlight-detail { margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 12px; }
+        .highlight-detail summary { cursor: pointer; color: #1677ff; font-weight: 800; font-size: 13px; list-style: none; }
+        .highlight-detail summary::-webkit-details-marker { display: none; }
+        .highlight-detail summary::after { content: '展开全文'; }
+        .highlight-detail[open] summary::after { content: '收起全文'; }
+        .highlight-detail[open] .highlight-body { margin-top: 10px; }
         .highlight-owner { margin-top: 12px; color: var(--text-sub); font-size: 12px; }
         
         @media (max-width: 980px) {
@@ -133,6 +154,10 @@
 
         function formatStatus(status) {
             return status === 'completed' ? '已达成阶段' : '进化中';
+        }
+
+        function isAlumni(pilot) {
+            return pilot.employment_status === 'departed';
         }
 
         function getStageMeta(step, definitions = {}) {
@@ -253,20 +278,25 @@
             const conclusionClass = pilot.conclusion === '顺利进行' ? '' : 'warning';
             const historyCount = getHistoryItems(pilot).length;
             const poFeedbackCount = getPoFeedbackItems(pilot).length;
+            const alumni = isAlumni(pilot);
 
             return `
-                <details class="pilot-card">
+                <details class="pilot-card ${alumni ? 'alumni' : ''}">
                     <summary class="card-header">
                         <div>
                             <div class="pilot-name">${escapeHtml(pilot.name)}</div>
                             <div class="pilot-sub">${escapeHtml(pilot.product_line)} · PO：${escapeHtml(pilot.po_name)}</div>
                         </div>
-                        <span class="badge badge-step">Step ${escapeHtml(pilot.current_step)}</span>
+                        <div class="card-badges">
+                            ${alumni ? '<span class="badge badge-alumni">已离职</span>' : ''}
+                            <span class="badge badge-step">Step ${escapeHtml(pilot.current_step)}</span>
+                        </div>
                     </summary>
                     <div class="card-body">
+                        ${alumni ? '<div class="alumni-note">历史保留成员，已不参与当前转型推进统计；展开后仍可查看过往进展与 PO 反馈。</div>' : ''}
                         <div class="info-row">
                             <div class="info-label">当前阶段</div>
-                            <div class="info-content">Step ${escapeHtml(pilot.current_step)} · ${escapeHtml(formatStatus(pilot.status))}</div>
+                            <div class="info-content">Step ${escapeHtml(pilot.current_step)} · ${alumni ? '历史保留' : escapeHtml(formatStatus(pilot.status))}</div>
                         </div>
                         <div class="info-row">
                             <div class="info-label">当前结论</div>
@@ -293,7 +323,7 @@
                     </div>
                     <div class="card-footer">
                         <span>更新于：${escapeHtml(pilot.last_update || '-')}</span>
-                        <span>${pilot.status === 'completed' ? '已达成阶段' : '进化中'}</span>
+                        <span>${alumni ? '已离职 · 历史保留' : (pilot.status === 'completed' ? '已达成阶段' : '进化中')}</span>
                     </div>
                 </details>
             `;
@@ -303,6 +333,25 @@
             return (Array.isArray(data.highlights) ? data.highlights : [])
                 .filter(item => item.title || item.body)
                 .sort((a, b) => getTimeValue(b.date) - getTimeValue(a.date));
+        }
+
+        function renderHighlightBody(item) {
+            const body = item.body || '';
+            if (!body) return '';
+            const escapedBody = escapeHtml(body);
+            const shouldCollapse = body.length > 140 || body.split('\n').length > 4;
+
+            if (!shouldCollapse) {
+                return `<div class="highlight-body">${escapedBody}</div>`;
+            }
+
+            return `
+                <div class="highlight-preview">${escapedBody}</div>
+                <details class="highlight-detail">
+                    <summary></summary>
+                    <div class="highlight-body">${escapedBody}</div>
+                </details>
+            `;
         }
 
         function renderHighlights(data) {
@@ -324,7 +373,7 @@
                             <div class="highlight-date">${escapeHtml(item.date || '未记录日期')}</div>
                             <div class="highlight-title">${escapeHtml(item.title)}</div>
                             <div class="highlight-subtitle">${escapeHtml(item.subtitle || '转型案例')}</div>
-                            <div class="highlight-body">${escapeHtml(item.body)}</div>
+                            ${renderHighlightBody(item)}
                             ${item.owner ? `<div class="highlight-owner">相关成员：${escapeHtml(item.owner)}</div>` : ''}
                         </article>
                     `).join('')}
@@ -333,18 +382,22 @@
         }
 
         function renderDashboard(data) {
+            const pilots = Array.isArray(data.pilots) ? data.pilots : [];
+            const activePilots = pilots.filter(pilot => !isAlumni(pilot));
+            const alumniPilots = pilots.filter(isAlumni);
             // 1. Render Summary Stats
             const stats = {
-                total: data.pilots.length,
-                step1: data.pilots.filter(p => p.current_step == 1).length,
-                step2: data.pilots.filter(p => p.current_step == 2).length,
-                step3: data.pilots.filter(p => p.current_step == 3).length
+                total: activePilots.length,
+                alumni: alumniPilots.length,
+                step1: activePilots.filter(p => p.current_step == 1).length,
+                step2: activePilots.filter(p => p.current_step == 2).length,
+                step3: activePilots.filter(p => p.current_step == 3).length
             };
 
             const summaryHtml = `
                 <div class="stat-card">
                     <div class="stat-value">${stats.total}</div>
-                    <div class="stat-label">试点成员总数</div>
+                    <div class="stat-label">当前试点成员</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">${stats.step1}</div>
@@ -364,9 +417,13 @@
             // 2. Render stage groups. Members and histories are ordered from newest to oldest.
             const listHtml = [1, 2, 3].map(step => {
                 const stageMeta = getStageMeta(step, data.steps_definition || {});
-                const pilots = data.pilots
+                const pilots = (data.pilots || [])
                     .filter(pilot => Number(pilot.current_step || 1) === step)
-                    .sort((a, b) => getTimeValue(b.last_update) - getTimeValue(a.last_update));
+                    .sort((a, b) => {
+                        if (isAlumni(a) !== isAlumni(b)) return isAlumni(a) ? 1 : -1;
+                        return getTimeValue(b.last_update) - getTimeValue(a.last_update);
+                    });
+                const activeCount = pilots.filter(pilot => !isAlumni(pilot)).length;
 
                 return `
                     <section class="stage-section">
@@ -376,7 +433,7 @@
                                 <div class="stage-title">${escapeHtml(stageMeta.title)}</div>
                                 <div class="stage-desc">${escapeHtml(stageMeta.desc)}</div>
                             </div>
-                            <div class="stage-count">${pilots.length} 位 PUX</div>
+                            <div class="stage-count">${activeCount} 位成员</div>
                         </div>
                         <div class="stage-grid">
                             ${pilots.length ? pilots.map(renderPilotCard).join('') : '<div class="progress-box">当前阶段暂无 PUX</div>'}

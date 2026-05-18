@@ -93,7 +93,8 @@
     async function loadPilots() {
       const response = await fetch('/api/pux/data', { cache: 'no-store' });
       const data = await response.json();
-      pilots = Array.isArray(data.pilots) ? data.pilots : [];
+      pilots = (Array.isArray(data.pilots) ? data.pilots : [])
+        .filter(pilot => pilot.employment_status !== 'departed');
       const select = document.getElementById('pilot-select');
       select.innerHTML = '<option value="">请选择姓名...</option>' + pilots.map(pilot => (
         `<option value="${pilot.id}">${pilot.name}</option>`

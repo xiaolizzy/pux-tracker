@@ -48,6 +48,10 @@ module.exports = async (req, res) => {
       return res.status(404).json({ success: false, message: 'PUX 成员不存在' });
     }
 
+    if (pilot.employment_status === 'departed') {
+      return res.status(400).json({ success: false, message: '该成员已离职，仅保留历史记录，不能继续提交 PO 反馈' });
+    }
+
     const today = new Date().toISOString().slice(0, 10);
     const feedback = {
       ...payload,
