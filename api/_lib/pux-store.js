@@ -141,13 +141,20 @@ function getStateUrl() {
 
 async function fetchWithTimeout(url, options = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), SUPABASE_TIMEOUT_MS);
+  let timeout = null;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeout = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`Supabase request timed out after ${SUPABASE_TIMEOUT_MS}ms`));
+    }, SUPABASE_TIMEOUT_MS);
+  });
 
   try {
-    return await fetch(url, {
+    const fetchPromise = fetch(url, {
       ...options,
       signal: controller.signal,
     });
+    return await Promise.race([fetchPromise, timeoutPromise]);
   } catch (error) {
     if (error.name === 'AbortError') {
       throw new Error(`Supabase request timed out after ${SUPABASE_TIMEOUT_MS}ms`);
