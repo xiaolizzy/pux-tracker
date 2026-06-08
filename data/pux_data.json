@@ -1,225 +1,203 @@
 {
-  "pux_members": [
+  "pilots": [
     {
       "id": "pux_001",
       "name": "容若",
-      "product_business": "Coohom/AINative",
-      "po_name": "锐仔",
-      "current_step": 1,
       "status": "in_progress",
-      "steps": {
-        "step1": {
-          "status": "in_progress",
-          "completed_date": null,
-          "project": "",
-          "description": "直接和研发对齐任务"
-        },
-        "step2": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "自己产生想法并推进"
-        },
-        "step3": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "从想法到 demo 甚至到推广运营"
-        }
-      },
+      "history": [],
+      "po_name": "锐仔",
+      "project": "",
+      "conclusion": "顺利进行",
       "last_update": "2026-04-21",
-      "history": []
+      "po_feedback": [],
+      "current_step": 1,
+      "product_line": "Coohom/AINative",
+      "execution_process": "直接和研发对齐任务"
     },
     {
       "id": "pux_002",
       "name": "图伊",
-      "product_business": "Coohom/商业增长",
-      "po_name": "锐仔",
-      "current_step": 1,
       "status": "in_progress",
-      "steps": {
-        "step1": {
+      "history": [
+        {
+          "date": "2026-04-28",
+          "name": "图伊",
+          "action": "admin_update",
           "status": "in_progress",
-          "completed_date": null,
-          "project": "",
-          "description": "直接和研发对齐任务"
-        },
-        "step2": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "自己产生想法并推进"
-        },
-        "step3": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "从想法到 demo 甚至到推广运营"
+          "po_name": "锐仔",
+          "project": "半前端+PUX综合工作",
+          "conclusion": "顺利进行",
+          "current_step": 2,
+          "product_line": "Coohom/商业增长",
+          "execution_process": "产品规划、设计任务独立完成，部分功能直接coding上线，后端审核代码，工作推进比较顺利，但从公司角度来看业务不确定是否会持续投入，后续是否介入coohom工具工作还需要和锐仔进一步讨论确认。"
         }
-      },
-      "last_update": "2026-04-21",
-      "history": []
+      ],
+      "po_name": "锐仔",
+      "project": "半前端+PUX综合工作",
+      "conclusion": "顺利进行",
+      "last_update": "2026-04-28",
+      "po_feedback": [],
+      "current_step": 2,
+      "product_line": "Coohom/商业增长",
+      "execution_process": "产品规划、设计任务独立完成，部分功能直接coding上线，后端审核代码，工作推进比较顺利，但从公司角度来看业务不确定是否会持续投入，后续是否介入coohom工具工作还需要和锐仔进一步讨论确认。"
     },
     {
       "id": "pux_003",
       "name": "沧耳",
-      "product_business": "Aholo平台",
-      "po_name": "邪神",
-      "current_step": 1,
       "status": "in_progress",
-      "steps": {
-        "step1": {
-          "status": "in_progress",
-          "completed_date": null,
-          "project": "",
-          "description": "直接和研发对齐任务"
-        },
-        "step2": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "自己产生想法并推进"
-        },
-        "step3": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "从想法到 demo 甚至到推广运营"
-        }
-      },
+      "history": [],
+      "po_name": "邪神",
+      "project": "",
+      "conclusion": "顺利进行",
       "last_update": "2026-04-21",
-      "history": []
+      "po_feedback": [],
+      "current_step": 1,
+      "product_line": "Aholo平台",
+      "execution_process": "直接和研发对齐任务"
     },
     {
       "id": "pux_004",
       "name": "柠木",
-      "product_business": "Coohom/企业产品",
-      "po_name": "九一",
-      "current_step": 1,
       "status": "in_progress",
-      "steps": {
-        "step1": {
+      "history": [
+        {
+          "date": "2026-04-28",
+          "name": "柠木",
+          "action": "admin_update",
           "status": "in_progress",
-          "completed_date": null,
-          "project": "",
-          "description": "直接和研发对齐任务"
+          "po_name": "九一",
+          "project": "AI布局架构、功能推广、效果调优、后台配置",
+          "conclusion": "顺利进行",
+          "current_step": 1,
+          "product_line": "Coohom/企业产品",
+          "execution_process": "由于之前基本就在做很多产品的工作，所以在工作适应上比较好，在PUX推进后，有更多的自主决策权和团队资源响应权"
         },
-        "step2": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "自己产生想法并推进"
-        },
-        "step3": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "从想法到 demo 甚至到推广运营"
+        {
+          "date": "2026-04-28",
+          "name": "柠木",
+          "action": "admin_update",
+          "status": "in_progress",
+          "po_name": "九一",
+          "project": "AI布局架构、功能推广、效果调优、后台配置",
+          "conclusion": "顺利进行",
+          "current_step": 1,
+          "product_line": "Coohom/企业产品",
+          "execution_process": "由于之前基本就在做很多产品的工作，所以在工作适应上比较好，在PUX推进后，有更多的自主决策权和团队资源响应权"
         }
-      },
-      "last_update": "2026-04-21",
-      "history": []
+      ],
+      "po_name": "九一",
+      "project": "AI布局架构、功能推广、效果调优、后台配置",
+      "conclusion": "顺利进行",
+      "last_update": "2026-04-28",
+      "po_feedback": [
+        {
+          "id": "pux_004",
+          "date": "2026-04-28",
+          "po_name": "九一",
+          "kpi_change": "",
+          "product_line": "Coohom/企业产品",
+          "reviewer_name": "九一",
+          "efficiency_change": "",
+          "milestone_summary": "设计开始参与到更全链路的产品考虑，是个不错的开始。比如：https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81436000561",
+          "collaboration_model": "稳定",
+          "business_module_goal": "AI橱柜布局增长",
+          "continue_willingness": "愿意继续",
+          "resource_coordination": ""
+        }
+      ],
+      "current_step": 1,
+      "product_line": "Coohom/企业产品",
+      "execution_process": "由于之前基本就在做很多产品的工作，所以在工作适应上比较好，在PUX推进后，有更多的自主决策权和团队资源响应权"
     },
     {
       "id": "pux_005",
       "name": "神乐",
-      "product_business": "酷家乐工具/make",
-      "po_name": "拾厘",
-      "current_step": 1,
       "status": "in_progress",
-      "steps": {
-        "step1": {
+      "history": [
+        {
+          "date": "2026-04-28",
+          "name": "神乐",
+          "action": "admin_update",
           "status": "in_progress",
-          "completed_date": null,
-          "project": "",
-          "description": "直接和研发对齐任务"
-        },
-        "step2": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "自己产生想法并推进"
-        },
-        "step3": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "从想法到 demo 甚至到推广运营"
+          "po_name": "拾厘",
+          "project": "探索通用Agent-90分场景和80分场景",
+          "conclusion": "顺利进行",
+          "current_step": 2,
+          "product_line": "酷家乐工具/make",
+          "execution_process": "90分场景：专注「布局组合和搭配」，通过「硬装/成品/定制RAG」、「硬装/产品/定制生成」、「布局组合coding化」等实验进行串联，预计下周可合并出初步demo。80分场景还在思考中。"
         }
-      },
-      "last_update": "2026-04-21",
-      "history": []
+      ],
+      "po_name": "拾厘",
+      "project": "探索通用Agent-90分场景和80分场景",
+      "conclusion": "顺利进行",
+      "last_update": "2026-04-28",
+      "po_feedback": [],
+      "current_step": 2,
+      "product_line": "酷家乐工具/make",
+      "execution_process": "90分场景：专注「布局组合和搭配」，通过「硬装/成品/定制RAG」、「硬装/产品/定制生成」、「布局组合coding化」等实验进行串联，预计下周可合并出初步demo。80分场景还在思考中。"
     },
     {
       "id": "pux_006",
       "name": "看看",
-      "product_business": "棚拍",
-      "po_name": "努努",
-      "current_step": 1,
       "status": "in_progress",
-      "steps": {
-        "step1": {
-          "status": "in_progress",
-          "completed_date": null,
-          "project": "",
-          "description": "直接和研发对齐任务"
-        },
-        "step2": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "自己产生想法并推进"
-        },
-        "step3": {
-          "status": "pending",
-          "completed_date": null,
-          "project": "",
-          "description": "从想法到 demo 甚至到推广运营"
-        }
-      },
+      "history": [],
+      "po_name": "努努",
+      "project": "",
+      "conclusion": "顺利进行",
       "last_update": "2026-04-21",
-      "history": []
+      "po_feedback": [],
+      "current_step": 1,
+      "product_line": "棚拍",
+      "execution_process": "直接和研发对齐任务"
     }
   ],
-  "backup_pux": [
+  "highlights": [
     {
-      "id": "backup_001",
-      "name": "葡萄",
-      "product_business": "酷家乐工具/工业仿真",
-      "po_name": "织墨"
+      "body": "案例背景：\n在Coohom的业务场景中，Elite和企业Team版主要面向小团队用户，但存在诸多问题：\n-自助能力低、升级转化难：C类和B类账号结构不互通，个人空间无法无缝升级到团队/企业空间，企业版只能通过销售售卖和人工开通，等等；\n-协同功能弱：Elite版实质是个人版通过分享复制方案达成协同目的，企业Team版的协同功能依旧较弱；\n-人工成本高：现有的企业Team版本ARR不高但需要耗费销售、CSC资源。\n同时，多业务出海需要统一的自助开户系统（技术架构），以减少重复性成本。作为负责Coohom team版自助开户项目的PUX，旨在解决这些问题并实现业务目标。\n\n做法：\n-通用方案设计：开展主流产品调研，考虑多业务出海适用的通用方案，包含整体TUC结构设计、自助开户流程、团队管理相关核心功能的通用框架设计，并使用Figma make快速产出demo原型。仍然保持从用户体验出发的设计思维，设计出符合用户习惯的产品功能和流程。\n-分阶段推进：制定项目落地计划，基于现有技术实现方式，拆分成一期和二期分步实现，明确一期需求、二期需求和上线计划、数据指标。\n-跨团队协作与提供策略：与Coohom研发团队、业务团队、国内中台团队的多方协作，例如，在技术方案的制定上，与技术团队沟通确定可行的技术路径，确保方案的小成本的可实现性；在业务策略上，与业务团队共同探讨Team版权限权益、如何提高开团率，提出合理的策略建议。多方合作的项目，最终没有以立项方式运行，而是以小团队方式快速迭代。\n-部分代码交付：通过vibe coding实现局部页面模块交付研发，例如团队管理页面、邀请成员弹窗等，以减少部分设计、前端研发耗时。\n\n结果：\n一期项目按计划推进落地，实现了新用户自助开户流程、新Elite版（Team版）的按seat收费模式以及团队管理的相关功能，成功将Team开户流程转为线上自助开户，打通了国际化C类订单的链路，提高了开户的效率和转化率。\n目前Coohom新Elite版已经在全球开放，新Elite新签收入占到了C端新签收入的43%（25Q4老Elite收入占25%左右），开团率达到了4%。\n\n可复用经验：\n缩短从需求到落地的链路：使用Figma make快速制作交互原型，助于团队快速理解需求。针对重前端交互的页面模块，采用vibe coding来实现，替代传统的画设计界面，以代码方式交付，以减少设计耗时、和前端研发耗时。\n相关产出/成果链接：Demo完整方案 https://rally-made-56317425.figma.site/、一期交付代码 https://eel-fray-08872081.figma.site/\n\n完整highlights内容详见：https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81453884266",
+      "date": "2026-05-09",
+      "owner": "图伊/Coohom",
+      "title": "从设计到开发全链路融合，驱动产品高效落地与价值实现",
+      "subtitle": "多角色职责拓展下的效率与价值的提升"
     },
     {
-      "id": "backup_002",
-      "name": "瑶一",
-      "product_business": "建筑结构/户型",
-      "po_name": "米兔"
+      "body": "案例背景：\nCoohom启动做一款新的AI产品——Coohom SnapIt，旨在帮助家具卖家更高效、精准地实现产品视觉化展示，以提升产品的吸引力和销售转化率。在项目的推进中，我的职责范围不断扩大，承担完整的产品需求设计、项目管理以及部分开发工作，实现了向综合能力更强的产品设计师的转型。\n\n做法：\n-功能规划与设计：了解目标用户的需求和痛点，规划产品功能、产品需求；通过Figma进行原型设计和打磨，确保产品的功能和用户体验达到最佳状态。了解各大AI大模型能力，确定大模型选型；Prompt调优和几百张图片的结果试验；制定合理的定价方案策略，确保产品的商业价值。\n-技术与设计结合：为了更好更快地实现产品设计和落地，学习前端开发技术，使用Cursor通过Vibe Coding的方式直接编写前端代码，push代码并发布。独立完成了7个需求的开发和4个落地页，提高了设计到开发的效率和质量。\n-数据观测和持续优化：学习并建立/优化数据看板30+，每日观测数据，分析用户行为和产品表现。根据数据反馈，自行Vibe Coding来完成首页改版和交互优化，提升用户体验。\n-项目管理和资源协调：由于项目人员较少，PUX不受职能范围限制，为项目完整性负责：例如前端资源缺失时，通过Vibe coding完成需求开发；当运营资源缺少时，完成落地页开发、撰写帮助文档功能更新等工作，确保项目的顺利进行。\n\n结果：\n-核心能力上线：成功上线了产品智能分析和一键生图、风格库和场景库、智能多角度、场景编辑、生成视频、多图上传、credit充值等核心能力，产品基础能力准备完毕。\n-用户满意度和商业价值验证：用户对产品的满意度评价为4.2分；有付费用户持续充值使用，充值次数高达11次。\n\n可复用经验：\n职责范围扩大，以高效落地为首要目标：将用户体验置于核心，全面负责从需求分析、设计、开发、上线全流程，当资源不足时可以自己通过Vibe Coding完成需求上线，确保产品的高效落地和价值快速验证。\n\n相关产出/成果落地页：\nhttps://www.coohom.com/snapit/upload-multi-product\nhttps://www.coohom.com/snapit/multiple-angles\nhttps://www.coohom.com/us/snapit/amazon-lifestyle-images\nhttps://www.coohom.com/us/snapit/white-background-product\n数据看板：https://kmb.qunhequnhe.com/dashboard/171-snapit\n\n完整highlights内容详见：https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81453884266",
+      "date": "2026-05-09",
+      "owner": "图伊/Coohom",
+      "title": "从设计到开发全链路融合，驱动产品高效落地与价值实现",
+      "subtitle": "多角色职责拓展下的效率与价值的提升"
     },
     {
-      "id": "backup_003",
-      "name": "雨落",
-      "product_business": "Coohom/商业增长&平台工具",
-      "po_name": "霄凡/锐仔"
+      "body": "背景：\n在收集到用户反馈棚拍设计工具层级复杂、操作繁琐等体验操作问题，PUX梳理问题并提出系统性的优化方案。\n\n做法：\nPUX针对棚拍工具重点模块的体验问题提出整体性体验优化方案方案探索_KooShot，提升3D工具产品易用性，在渲染弹窗、图册入口首先落地，提升用户输出设置、查看结果的操作便利性。\n完善链路的确实埋点，KooShot渲染、图册埋点，制定度量方案，便于后续持续观测数据变化。\n\n结果：\n用户功能价值：棚拍渲染、图册的操作更直观高效，提升用户完成渲染、进入图册看结果的转化率、操作效率。\n当前进展：目前埋点已经上线，功能优化代码开发已经完成，正在测试中，预计5.28号上线\n\n\n可复用的经验：\nPUX需多方收集问题反馈，系统思考整体解决思路，在重点功能上优先落地。\n\n相关产出/成果：kooShot方案探索https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81411506436\n完整highlights描述详见：https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81453884945",
+      "date": "2026-05-09",
+      "owner": "看看/棚拍",
+      "title": "从发现问题到方案设计、代码落地的完整闭环",
+      "subtitle": "主动梳理系统性的解决方案，并推进方案落地，提升工具操作效率"
     },
     {
-      "id": "backup_004",
-      "name": "藜漫",
-      "product_business": "酷家乐工具/KAF（后续可能渲染）",
-      "po_name": "乃量/天哲"
+      "body": "背景：\n通过调研发现在电商图片中，用户需要在效果图上增加尺寸来展示商品大小、部件结构尺寸等信息。用户原工作流程通过PS、inllustrate等传统软件来实现，操作和标注过程繁琐。\n\n做法：\nPUX在过程从想法、需求、demo、推进开发、到权限与定价配置全流程工作。\n调研了市面上跨境电商图片标注的偏好和特点，通过dify工作流+生图模型快速搭建demo，完成商品尺寸线测试效果的测试，最终确定了“大模型识别→用户确认→AI生成”的功能形态，并推动此功能进入开发，预计六月上线到棚拍AI工具箱中，扩充了电商用户的核豆消耗场景。\n\n结果：\n用户功能价值：用户借助AI能力帮助用户快速实现标注尺寸，在保证标注效果的前提下，降低操作门槛，提升出图效率。\n商业价值：增加了核豆消耗场景\n当前进展：目前功能正在开发中，预计六月上线\n\n可复用的经验：\n拓展了职能边界，从市场问题到产品解决方案的落地，快速通过demo验证可行性，缩短从问题到解决落地的周期",
+      "date": "2026-05-09",
+      "owner": "看看/棚拍",
+      "title": "从发现问题到方案设计、代码落地的完整闭环",
+      "subtitle": "基于客户的问题，基于dify等AI工具实现Demo，完善棚拍AI工具的能力，解决用户尺寸标注繁琐的用户场景"
+    },
+    {
+      "body": "【AI家装设计生成项目案例】\n案例背景\n在局改和空间适配整体内装场景中，AI 家装设计不仅需要生成效果图，还需要理解户型、需求、参考图、硬装约束和真实商品资产。现有方案容易停留在视觉生成层面，缺少结构化数据承接，导致后续布局生成、商品召回、材质匹配和质量检测难以形成完整闭环。\n作为该项目的 PUX，目标是梳理 AI 家装设计的产品流程和系统架构，探索一套可理解、可编辑、可检测、可落地的智能设计生成方案。\n\n做法\n1. 定义 AI 家装设计生成流程\n围绕用户输入、输入解析、设计约束、AI 生产、质量检测和结果输出，梳理完整流程图。流程覆盖户型图、需求描述、参考图、扫描文件等输入方式，并拆解出意图理解、中间数据、模型生成、硬装 3DGS 生成 / 硬装风格匹配、RAG 系统和检测模块等核心架构。\n2. 提出 Design Spec 结构化中间层\n针对 AI 难以稳定理解用户意图、工程侧难以直接消费自然语言结果的问题，提出 Design Spec 作为意图理解的结构化数据层，将空间、功能、风格、预算、材质等信息转化为可执行约束，为布局生成、商品召回和质量检测提供统一标准。\n3. 设计 L1-L2-L3 分层布局策略\n提出将空间布局拆分为「域 L1 - 件 L2 - 构 L3」：\nL1：空间功能域，如客厅区、餐厅区；\nL2：标准家具 / 商品实体，如沙发、茶几；\nL3：局部构件与属性，如颜色、材质、纹理。\n该策略降低了布局算法复杂度，避免组合爆炸；同时让 L2 可对接真实 SKU 和模型库，提高商品召回准确性；也支持用户局部修改，例如换材质只刷新 L3，换家具只刷新 L2，提升编辑效率。\n4. 完成产品方案与 Demo\n完成产品框架定义、功能定义和交互 UI 设计，并输出可交互 Demo。阶段性重点验证了沙发区域布局生成、硬装材质识别与匹配能力。同时提出通过 3D 翻模弥补 RAG 系统缺陷、支持扫描文件输入局改设计、通过生图模型提取硬装材质和铺贴工艺信息等方案。\n\n结果\n项目完成了 AI 家装设计生成的核心流程、产品架构、Design Spec 中间层、分层布局策略和可交互 Demo。阶段性验证了沙发区域布局和硬装材质识别匹配能力。\n后续由于业务方向调整，项目暂停，暂未进入完整落地阶段。但该项目沉淀了 AI 家装设计从「效果生成」走向「结构化、可编辑、可工程化」的产品设计思路。\n\n可复用经验\n1. 用系统架构承接复杂 AI 能力\nPUX 不仅要设计界面，还需要将 AI 能力拆解为输入、解析、生成、检测、输出等模块，帮助团队建立统一沟通语言。\n2. 用结构化数据提升 AI 稳定性\nDesign Spec 可作为用户意图和工程执行之间的桥梁，减少纯 Prompt 驱动的不确定性。\n3. 用分层策略提升生成与编辑效率\nL1-L2-L3 的拆分同时服务算法计算、商品召回和用户局部编辑，是复杂 AI 设计场景中可复用的产品抽象方法。\n\n完整案例含demo演示：https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81452873069",
+      "date": "2026-05-18",
+      "owner": "神乐/酷家乐工具-Make",
+      "title": "架构与Demo实践：AI 驱动的通用3D风格设计与布局优化",
+      "subtitle": "独立业务分析、用户意图结构化转化与风格可控 Demo，沉淀可落地的 3D智能设计能力"
+    },
+    {
+      "body": "【Assembly agent-风格模块与体验框架】\n\n案例背景\n装配Agent中，风格外观的改动如果每次带来重新生成装配或核心几何，token消耗巨大且结构不稳定，生成结果难以稳定修改和复用。例如用户想调整材质、颜色或风格时，系统要重新生成。\n因此，本项目希望探索一套更可控的风格生成与修改机制，将外观、参数、结构进行解耦维护，提高数据可改性，并拓展 AI 设计中的可变量。\n\n做法\n1. 设计风格 Agent 架构\n围绕用户输入、意图理解、默认规则、规划操作、核心状态、参数约束、多表示共存、质量校验和交付工具，梳理完整的风格 Agent 架构。核心目标是让系统能够理解用户的风格修改意图，并转化为可执行、可追踪、可校验的设计操作。\n2. 定义外观 / 参数 / 结构解耦方案\n将设计状态拆分为：\n外观状态：材质、纹理、颜色、表面效果等；\n参数状态：尺寸、厚度、比例、半径等；\n结构状态：部件、层级、连接关系、空间结构等。\n通过状态拆分，使风格修改不再直接影响结构稳定性。例如修改材质时只更新外观状态，调整尺寸时只影响参数状态，避免局部修改导致整体重算。\n3. 建立风格 Family 与材质推理机制\n提出通过图像生成、材质推理和风格 Family 概念影响建模外观。系统可根据用户意图匹配或生成材质，并通过风格一致性控制，保证同一空间内不同对象在材质、色彩和风格表达上保持统一。\n4. 完成产品设计与 Demo 产出\n完成风格 Agent 的产品交互框架、功能定义和 Design.md 设计说明，并通过 Vibe Coding 输出“风格修改 Demo”。Demo 用于验证用户从提出修改意图，到系统识别变化对象、生成修改方案、保持风格一致性的完整体验链路。\n\n结果\n项目完成了风格 Agent 的核心架构设计、外观 / 参数 / 结构解耦方案、材质匹配与生成策略。风格一致性控制方案在持续探索中。\n该项目为 AI 3d设计中的“风格可控修改”提供了产品化思路，使系统从单次生成效果，进一步走向可编辑、可维护、可复用的设计状态管理。\n\n可复用经验\n1. 用状态解耦提升 AI 设计可控性\n将外观、参数、结构拆分维护，可以避免局部修改影响整体结果，是复杂 AI 设计工具中重要的产品抽象。\n2. 用风格 Family 控制整体一致性\n思路上通过风格族群、材质推理和图像生成能力，让不同对象在变化后仍保持统一的空间风格的能力尚在探索中\n3. 用 Agent 架构承接用户意图到设计执行\n风格 Agent 不只是识别需求，还需要完成规划、执行、状态更新和质量校验，帮助 AI 修改从“随机生成风格”变成“可控操作风格修改”。\n4. 用 Coding 快速验证复杂交互\n通过 Demo 快速表达风格修改链路，后续计划沉淀风格外观Toolorskill。\n\n完整案例含demo演示：https://cf.qunhequnhe.com/pages/viewpage.action?pageId=81452873069",
+      "date": "2026-05-18",
+      "owner": "神乐/酷家乐工具-Make",
+      "title": "架构与Demo实践：AI 驱动的通用3D风格设计与布局优化",
+      "subtitle": "独立业务分析、用户意图结构化转化与风格可控 Demo，沉淀可落地的3D智能设计能力"
     }
   ],
-  "po_feedback": [],
   "steps_definition": {
-    "step1": {
-      "name": "第一步",
-      "description": "直接和研发对齐任务"
-    },
-    "step2": {
-      "name": "第二步",
-      "description": "自己产生想法并推进"
-    },
-    "step3": {
-      "name": "第三步",
-      "description": "从想法到 demo 甚至到推广运营"
-    }
+    "1": "直接和研发对齐任务",
+    "2": "自己产生想法并推进",
+    "3": "从想法到 demo 甚至到推广运营"
   }
 }
