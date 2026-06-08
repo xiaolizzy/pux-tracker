@@ -1,4 +1,4 @@
-const { getStoreHealth, readData } = require('./_lib/pux-store');
+const { readData } = require('./_lib/pux-store');
 
 module.exports = async (req, res) => {
   if (req.method !== 'GET') {
@@ -7,13 +7,17 @@ module.exports = async (req, res) => {
 
   try {
     if (String(req.url || '').includes('health=1')) {
-      const health = await getStoreHealth();
-      return res.status(health.supabaseReadable ? 200 : 503).json({
-        success: health.supabaseReadable,
-        ...health,
-        message: health.supabaseReadable
-          ? 'Supabase is readable'
-          : 'Supabase is not readable; submissions should be paused or backed up',
+      const result = await readData();
+      const isLiveStorage = result.source === 'supabase' && result.writable;
+      res.setHeader('Cache-Control', 'no-store');
+      return res.status(isLiveStorage ? 200 : 503).json({
+        success: isLiveStorage,
+        source: result.source,
+        writable: result.writable,
+        error: result.error || '',
+        message: isLiveStorage
+          ? 'Live Supabase storage is available'
+          : 'Live Supabase storage is unavailable; dashboard is using fallback data',
       });
     }
 
