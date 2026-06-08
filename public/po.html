@@ -158,8 +158,8 @@
         });
 
         const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || '提交失败');
-        showMessage(result.writable ? '提交成功，看板会自动同步' : '提交成功，但 Supabase 未配置，线上不会持久化', result.writable ? 'success' : 'error');
+        if (!response.ok || !result.success) throw new Error(result.message || '提交失败，请截图保存后联系管理员');
+        showMessage('提交成功，看板会自动同步', 'success');
       } catch (error) {
         showMessage(error.message, 'error');
       } finally {

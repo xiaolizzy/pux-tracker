@@ -64,7 +64,6 @@ module.exports = async (req, res) => {
     pilot.po_feedback.push(feedback);
     pilot.last_update = today;
 
-    const writeResult = await writeData(data);
     const dashboardUrl = `${getPublicBaseUrl(req)}/pux-dashboard`;
     const message =
       `🧭【PO 反馈同步】\n` +
@@ -82,6 +81,19 @@ module.exports = async (req, res) => {
       wecomResult = await sendTextToWeCom(process.env.FEEDBACK_WEBHOOK_URL, message);
     } catch (error) {
       wecomResult = { success: false, message: error.message };
+    }
+
+    const writeResult = await writeData(data);
+    if (!writeResult.writable) {
+      return res.status(503).json({
+        success: false,
+        writable: false,
+        source: writeResult.source,
+        wecom: wecomResult,
+        message: wecomResult?.success || wecomResult?.errcode === 0
+          ? '数据库暂时不可写，内容已推送到企微作为备份，但尚未同步到看板'
+          : '数据库暂时不可写，且企微备份推送失败，请先截图保存后联系管理员',
+      });
     }
 
     return res.status(200).json({

@@ -24,6 +24,10 @@
       "destination": "/api/pux-admin.js"
     },
     {
+      "source": "/api/pux/health",
+      "destination": "/api/pux-health.js"
+    },
+    {
       "source": "/api/pux/po-feedback",
       "destination": "/api/pux-po-feedback.js"
     },

@@ -243,7 +243,38 @@ async function writeData(data) {
   };
 }
 
+async function getStoreHealth() {
+  const health = {
+    fallbackReadable: false,
+    hasSupabaseConfig: hasSupabaseConfig(),
+    supabaseReadable: false,
+    error: '',
+  };
+
+  try {
+    readFallbackData();
+    health.fallbackReadable = true;
+  } catch (error) {
+    health.error = `Fallback read failed: ${error.message}`;
+  }
+
+  if (!health.hasSupabaseConfig) {
+    health.error = health.error || 'Missing Supabase environment variables';
+    return health;
+  }
+
+  try {
+    await readSupabaseData();
+    health.supabaseReadable = true;
+  } catch (error) {
+    health.error = error.message || 'Supabase read failed';
+  }
+
+  return health;
+}
+
 module.exports = {
   readData,
   writeData,
+  getStoreHealth,
 };

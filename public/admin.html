@@ -580,7 +580,10 @@
           ? result.data.pilots[result.data.pilots.length - 1].id
           : payload.id;
         mode = 'edit';
-        showMessage(result.writable ? '已保存，线上看板会自动同步' : '已保存到请求中，但 Supabase 未配置，线上不会持久化', result.writable ? 'success' : 'error');
+        if (!result.writable) {
+          throw new Error('数据库暂时不可写，保存未同步到看板，请稍后重试');
+        }
+        showMessage('已保存，线上看板会自动同步');
         await loadData();
       } catch (error) {
         showMessage(error.message, 'error');
