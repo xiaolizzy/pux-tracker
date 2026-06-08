@@ -185,7 +185,18 @@ async function readData() {
     };
   }
 
-  const data = await readSupabaseData();
+  let data = null;
+  try {
+    data = await readSupabaseData();
+  } catch (error) {
+    return {
+      data: fallbackData,
+      source: 'fallback-json-after-supabase-error',
+      writable: false,
+      error: error.message,
+    };
+  }
+
   if (data) {
     return {
       data: sanitizeDashboardData(data),
@@ -213,7 +224,18 @@ async function writeData(data) {
     };
   }
 
-  const savedData = await writeSupabaseData(cleanData);
+  let savedData = null;
+  try {
+    savedData = await writeSupabaseData(cleanData);
+  } catch (error) {
+    return {
+      data: cleanData,
+      source: 'fallback-json-after-supabase-error',
+      writable: false,
+      error: error.message,
+    };
+  }
+
   return {
     data: sanitizeDashboardData(savedData),
     source: 'supabase',
