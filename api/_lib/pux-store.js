@@ -7,6 +7,7 @@ const FALLBACK_DATA_PATHS = [
 ];
 const STATE_ID = 'main';
 const TABLE_NAME = process.env.SUPABASE_STATE_TABLE || 'pux_dashboard_state';
+const SUPABASE_TIMEOUT_MS = Number(process.env.SUPABASE_TIMEOUT_MS || 5000);
 
 function readFallbackData() {
   const dataPath = FALLBACK_DATA_PATHS.find((item) => fs.existsSync(item));
@@ -138,8 +139,27 @@ function getStateUrl() {
   return `${baseUrl}/rest/v1/${TABLE_NAME}`;
 }
 
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SUPABASE_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error(`Supabase request timed out after ${SUPABASE_TIMEOUT_MS}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function readSupabaseData() {
-  const response = await fetch(`${getStateUrl()}?id=eq.${STATE_ID}&select=data`, {
+  const response = await fetchWithTimeout(`${getStateUrl()}?id=eq.${STATE_ID}&select=data`, {
     method: 'GET',
     headers: getSupabaseHeaders(),
   });
@@ -153,7 +173,7 @@ async function readSupabaseData() {
 }
 
 async function writeSupabaseData(data) {
-  const response = await fetch(getStateUrl(), {
+  const response = await fetchWithTimeout(getStateUrl(), {
     method: 'POST',
     headers: {
       ...getSupabaseHeaders(),
