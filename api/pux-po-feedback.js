@@ -89,13 +89,15 @@ module.exports = async (req, res) => {
 
     const writeResult = await writeData(data);
     if (!writeResult.writable) {
-      return res.status(503).json({
-        success: false,
+      const backedUp = Boolean(wecomResult?.success || wecomResult?.errcode === 0);
+      return res.status(backedUp ? 202 : 503).json({
+        success: backedUp,
+        pending_sync: backedUp,
         writable: false,
         source: writeResult.source,
         wecom: wecomResult,
-        message: wecomResult?.success || wecomResult?.errcode === 0
-          ? '数据库暂时不可写，内容已推送到企微作为备份，但尚未同步到看板'
+        message: backedUp
+          ? '已接收并推送到企微备份，数据库恢复后需由管理员同步到看板'
           : '数据库暂时不可写，且企微备份推送失败，请先截图保存后联系管理员',
       });
     }

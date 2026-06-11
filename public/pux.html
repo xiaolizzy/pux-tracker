@@ -154,7 +154,7 @@
         });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || '提交失败，请截图保存后联系管理员');
-        showMessage('提交成功，看板会自动同步', 'success');
+        showMessage(result.pending_sync ? '提交已接收，已推送企微备份，稍后同步看板' : '提交成功，看板会自动同步', 'success');
         await loadPilots();
       } catch (error) {
         showMessage(error.message, 'error');
