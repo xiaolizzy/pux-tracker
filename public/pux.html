@@ -82,6 +82,13 @@
   </main>
 
   <script>
+    const FALLBACK_PILOTS = [
+      { id: 'pux_001', name: '容若', product_line: 'Coohom/AINative', po_name: '锐仔', current_step: 2, status: 'in_progress', project: '', execution_process: '已进入第二阶段：主动产生想法并推进。', conclusion: '顺利进行', employment_status: 'active' },
+      { id: 'pux_002', name: '图伊', product_line: 'Coohom/商业增长', po_name: '锐仔', current_step: 2, status: 'in_progress', project: '半前端+PUX综合工作', execution_process: '产品规划、设计任务独立完成，部分功能直接coding上线，后端审核代码，工作推进比较顺利。', conclusion: '顺利进行', employment_status: 'active' },
+      { id: 'pux_003', name: '沧耳', product_line: 'Aholo平台', po_name: '邪神', current_step: 2, status: 'in_progress', project: '', execution_process: '已进入第二阶段：主动产生想法并推进。', conclusion: '顺利进行', employment_status: 'active' },
+      { id: 'pux_005', name: '神乐', product_line: '酷家乐工具/make', po_name: '拾厘', current_step: 2, status: 'in_progress', project: '探索通用Agent-90分场景和80分场景', execution_process: '90分场景持续推进，80分场景仍在思考中。', conclusion: '顺利进行', employment_status: 'active' },
+      { id: 'pux_006', name: '看看', product_line: '棚拍', po_name: '努努', current_step: 1, status: 'in_progress', project: '', execution_process: '直接和研发对齐任务', conclusion: '顺利进行', employment_status: 'active' },
+    ];
     let pilots = [];
 
     function showMessage(text, type = 'success') {
@@ -91,8 +98,18 @@
     }
 
     async function loadPilots() {
-      const response = await fetch('/api/pux/data', { cache: 'no-store' });
-      const data = await response.json();
+      let data = null;
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch('/api/pux/data', { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeout);
+        if (!response.ok) throw new Error('加载 PUX 名单失败');
+        data = await response.json();
+      } catch (error) {
+        data = { pilots: FALLBACK_PILOTS };
+        showMessage('名单加载较慢，已启用备用名单；如需提交，请确认网络后再试。', 'error');
+      }
       pilots = (Array.isArray(data.pilots) ? data.pilots : [])
         .filter(pilot => pilot.employment_status !== 'departed');
       const select = document.getElementById('pilot-select');

@@ -101,6 +101,13 @@
   </main>
 
   <script>
+    const FALLBACK_PILOTS = [
+      { id: 'pux_001', name: '容若', product_line: 'Coohom/AINative', po_name: '锐仔', current_step: 2, employment_status: 'active' },
+      { id: 'pux_002', name: '图伊', product_line: 'Coohom/商业增长', po_name: '锐仔', current_step: 2, employment_status: 'active' },
+      { id: 'pux_003', name: '沧耳', product_line: 'Aholo平台', po_name: '邪神', current_step: 2, employment_status: 'active' },
+      { id: 'pux_005', name: '神乐', product_line: '酷家乐工具/make', po_name: '拾厘', current_step: 2, employment_status: 'active' },
+      { id: 'pux_006', name: '看看', product_line: '棚拍', po_name: '努努', current_step: 1, employment_status: 'active' },
+    ];
     let pilots = [];
 
     function showMessage(text, type = 'success') {
@@ -110,9 +117,18 @@
     }
 
     async function loadPilots() {
-      const response = await fetch('/api/pux/data', { cache: 'no-store' });
-      if (!response.ok) throw new Error('加载 PUX 名单失败');
-      const data = await response.json();
+      let data = null;
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch('/api/pux/data', { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeout);
+        if (!response.ok) throw new Error('加载 PUX 名单失败');
+        data = await response.json();
+      } catch (error) {
+        data = { pilots: FALLBACK_PILOTS };
+        showMessage('名单加载较慢，已启用备用名单；如需提交，请确认网络后再试。', 'error');
+      }
       pilots = (Array.isArray(data.pilots) ? data.pilots : [])
         .filter(pilot => pilot.employment_status !== 'departed');
       const select = document.getElementById('pilot-select');
