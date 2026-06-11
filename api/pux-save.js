@@ -8,6 +8,10 @@ function getPublicBaseUrl(req) {
   return `${protocol}://${host}`;
 }
 
+function getPuxFeedbackWebhookUrl() {
+  return process.env.FEEDBACK_WEBHOOK_URL || process.env.WECOM_PUX_REMINDER_WEBHOOK_URL;
+}
+
 function normalizePayload(body = {}) {
   return {
     id: body.id,
@@ -80,7 +84,7 @@ module.exports = async (req, res) => {
 
     let wecomResult = null;
     try {
-      wecomResult = await sendTextToWeCom(process.env.FEEDBACK_WEBHOOK_URL, message);
+      wecomResult = await sendTextToWeCom(getPuxFeedbackWebhookUrl(), message);
     } catch (error) {
       wecomResult = { success: false, message: error.message };
     }

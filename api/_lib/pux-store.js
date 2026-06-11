@@ -1,4 +1,5 @@
 const fs = require('fs');
+const https = require('https');
 const path = require('path');
 
 const FALLBACK_DATA_PATHS = [
@@ -167,8 +168,59 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
+function requestWithTimeout(url, options = {}) {
+  const target = new URL(url);
+  const body = options.body || null;
+
+  return new Promise((resolve, reject) => {
+    const request = https.request(
+      {
+        method: options.method || 'GET',
+        hostname: target.hostname,
+        path: `${target.pathname}${target.search}`,
+        headers: options.headers || {},
+        timeout: SUPABASE_TIMEOUT_MS,
+      },
+      (response) => {
+        let raw = '';
+        response.setEncoding('utf8');
+        response.on('data', (chunk) => {
+          raw += chunk;
+        });
+        response.on('end', () => {
+          resolve({
+            ok: response.statusCode >= 200 && response.statusCode < 300,
+            status: response.statusCode,
+            text: async () => raw,
+            json: async () => JSON.parse(raw || 'null'),
+          });
+        });
+      }
+    );
+
+    request.on('timeout', () => {
+      request.destroy(new Error(`Supabase https request timed out after ${SUPABASE_TIMEOUT_MS}ms`));
+    });
+    request.on('error', reject);
+    if (body) request.write(body);
+    request.end();
+  });
+}
+
+async function requestSupabase(url, options = {}) {
+  try {
+    return await fetchWithTimeout(url, options);
+  } catch (fetchError) {
+    try {
+      return await requestWithTimeout(url, options);
+    } catch (httpsError) {
+      throw new Error(`fetch failed: ${fetchError.message}; https failed: ${httpsError.message}`);
+    }
+  }
+}
+
 async function readSupabaseData() {
-  const response = await fetchWithTimeout(`${getStateUrl()}?id=eq.${STATE_ID}&select=data`, {
+  const response = await requestSupabase(`${getStateUrl()}?id=eq.${STATE_ID}&select=data`, {
     method: 'GET',
     headers: getSupabaseHeaders(),
   });
@@ -182,7 +234,7 @@ async function readSupabaseData() {
 }
 
 async function writeSupabaseData(data) {
-  const response = await fetchWithTimeout(getStateUrl(), {
+  const response = await requestSupabase(getStateUrl(), {
     method: 'POST',
     headers: {
       ...getSupabaseHeaders(),
