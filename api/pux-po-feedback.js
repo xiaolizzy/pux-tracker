@@ -9,7 +9,7 @@ function getPublicBaseUrl(req) {
 }
 
 function getPoFeedbackWebhookUrl() {
-  return process.env.FEEDBACK_WEBHOOK_URL || process.env.WECOM_PO_REMINDER_WEBHOOK_URL;
+  return process.env.WECOM_PO_FEEDBACK_WEBHOOK_URL || process.env.FEEDBACK_WEBHOOK_URL;
 }
 
 function normalizePayload(body = {}) {
