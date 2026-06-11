@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const FALLBACK_DATA_PATHS = [
+  path.join(__dirname, '..', '..', 'data', 'pux_data.json'),
+  path.join(__dirname, '..', '..', 'pux-tracker', 'pux_pilots.json'),
   path.join(process.cwd(), 'pux-tracker', 'pux_pilots.json'),
   path.join(process.cwd(), 'data', 'pux_data.json'),
 ];
