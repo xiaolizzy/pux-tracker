@@ -26,16 +26,18 @@ module.exports = async (req, res) => {
   const formUrl = `${baseUrl}/pux`;
   const fallbackFormUrl = process.env.WECOM_PUX_FALLBACK_FORM_URL || DEFAULT_PUX_FALLBACK_FORM_URL;
   const dashboardUrl = `${baseUrl}/pux-dashboard`;
-  const message =
-    `📮【PUX 本周进展收集】\n` +
-    `请大家在本周五前同步 PUX 转型进展，重点补充：\n` +
-    `1. 当前处于哪个转型阶段\n` +
-    `2. 本周负责内容 / 关联项目\n` +
-    `3. 执行过程、产出、卡点和下一步\n` +
-    `4. 当前结论：顺利进行 / 待观察 / 遇到阻碍\n\n` +
-    `填写入口：${formUrl}\n` +
-    `备用入口（企业微信问卷）：${fallbackFormUrl}\n` +
-    `看板入口：${dashboardUrl}`;
+  const isManualTest = String(req.url || '').includes('manualTest=1');
+  const message = isManualTest
+    ? `【PUX 看板测试】这是一条 PUX 收集机器人连通性测试消息，请忽略，无需填写。\n\nPUX入口：${formUrl}\n备用入口：${fallbackFormUrl}\n看板：${dashboardUrl}`
+    : `📮【PUX 本周进展收集】\n` +
+      `请大家在本周五前同步 PUX 转型进展，重点补充：\n` +
+      `1. 当前处于哪个转型阶段\n` +
+      `2. 本周负责内容 / 关联项目\n` +
+      `3. 执行过程、产出、卡点和下一步\n` +
+      `4. 当前结论：顺利进行 / 待观察 / 遇到阻碍\n\n` +
+      `填写入口：${formUrl}\n` +
+      `备用入口（企业微信问卷）：${fallbackFormUrl}\n` +
+      `看板入口：${dashboardUrl}`;
 
   try {
     const wecom = await sendTextToWeCom(process.env.WECOM_PUX_REMINDER_WEBHOOK_URL, message);

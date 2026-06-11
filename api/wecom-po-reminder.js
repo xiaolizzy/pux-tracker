@@ -26,17 +26,19 @@ module.exports = async (req, res) => {
   const formUrl = `${baseUrl}/po`;
   const fallbackFormUrl = process.env.WECOM_PO_FALLBACK_FORM_URL || DEFAULT_PO_FALLBACK_FORM_URL;
   const dashboardUrl = `${baseUrl}/pux-dashboard`;
-  const message =
-    `📮【PO 视角协作反馈收集】\n` +
-    `请各位 PO 在本周五前补充 PUX 转型协作评价，重点反馈：\n` +
-    `1. PUX 对应的业务模块和目标是否明确\n` +
-    `2. 双方磨合与资源协调情况\n` +
-    `3. 是否形成稳定协作模式\n` +
-    `4. 是否愿意继续这种合作方式\n` +
-    `5. 核心 KPI 和方案产出效率是否有正向变化\n\n` +
-    `填写入口：${formUrl}\n` +
-    `备用入口（企业微信问卷）：${fallbackFormUrl}\n` +
-    `看板入口：${dashboardUrl}`;
+  const isManualTest = String(req.url || '').includes('manualTest=1');
+  const message = isManualTest
+    ? `【PUX 看板测试】这是一条 PO 收集机器人连通性测试消息，请忽略，无需填写。\n\nPO入口：${formUrl}\n备用入口：${fallbackFormUrl}\n看板：${dashboardUrl}`
+    : `📮【PO 视角协作反馈收集】\n` +
+      `请各位 PO 在本周五前补充 PUX 转型协作评价，重点反馈：\n` +
+      `1. PUX 对应的业务模块和目标是否明确\n` +
+      `2. 双方磨合与资源协调情况\n` +
+      `3. 是否形成稳定协作模式\n` +
+      `4. 是否愿意继续这种合作方式\n` +
+      `5. 核心 KPI 和方案产出效率是否有正向变化\n\n` +
+      `填写入口：${formUrl}\n` +
+      `备用入口（企业微信问卷）：${fallbackFormUrl}\n` +
+      `看板入口：${dashboardUrl}`;
 
   try {
     const wecom = await sendTextToWeCom(process.env.WECOM_PO_REMINDER_WEBHOOK_URL, message);
